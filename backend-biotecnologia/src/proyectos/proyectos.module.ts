@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProyectosService } from './proyectos.service';
 import { ProyectosController } from './proyectos.controller';
 import { Proyecto } from './proyectos.entity';
-import { LogsModule } from '../Documentos/logs/logs.module'; // 👈 importamos LogsModule
+import { LogsModule } from '../logs/logs.module'; // 👈 importamos LogsModule
 
 @Module({
   imports: [

@@ -3,7 +3,7 @@ import {
   UsePipes, ValidationPipe, Req, UseGuards 
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { LogsService } from '../Documentos/logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { ServiciosService } from './servicios.service';
 import { Servicio } from './servicio.entity';
 import { CreateServicioDto } from './dto/create-servicio.dto';

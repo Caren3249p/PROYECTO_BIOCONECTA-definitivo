@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Req, UseGuards, Inject } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { LogsService } from '../Documentos/logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { RolesGuard } from '../auth/roles.guard';

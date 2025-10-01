@@ -10,7 +10,7 @@ import { MetricasService } from './metricas.service';
 import { ReportesService } from './reportes.service';
 import { ExportService } from './export.service';
 import { ReportesController } from './reportes.controller';
-import { LogsModule } from '../src/Documentos/logs/logs.module';
+import { LogsModule } from '../src/logs/logs.module';
 
 @Module({
   imports: [

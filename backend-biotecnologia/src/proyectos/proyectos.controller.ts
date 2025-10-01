@@ -13,7 +13,7 @@ import {
 import { ProyectosService } from './proyectos.service';
 import { Proyecto } from './proyectos.entity';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
-import { LogsService } from '../Documentos/logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Body, Param, Delete, UsePipes, ValidationPipe, Req, UseGuards, Inject } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { LogsService } from '../Documentos/logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { TareasService } from './tareas.service';
 import { Tarea } from './tarea.entity';
 import { CreateTareaDto } from './dto/create-tarea.dto';
