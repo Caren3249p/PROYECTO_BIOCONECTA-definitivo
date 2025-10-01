@@ -30,8 +30,8 @@ export default function Servicios() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-teal-900 text-white flex flex-col items-center px-6 py-16">
-      <h1 className="text-4xl font-bold mb-12 text-yellow-300 drop-shadow-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-cyan-900 text-white flex flex-col items-center px-6 py-16">
+      <h1 className="text-4xl font-bold mb-12 text-teal-300 drop-shadow-md">
         Nuestros Servicios
       </h1>
 
@@ -39,14 +39,14 @@ export default function Servicios() {
         {servicios.map((servicio, index) => (
           <Card
             key={index}
-            className="bg-gradient-to-br from-green-700 to-green-600 text-center shadow-xl rounded-2xl p-6 border border-green-500 hover:scale-105 hover:shadow-2xl hover:border-yellow-400 transition-transform duration-300"
+            className="bg-gradient-to-br from-teal-700 to-cyan-600 text-center shadow-xl rounded-2xl p-6 border border-teal-500 hover:scale-105 hover:shadow-2xl hover:border-teal-300 transition-transform duration-300"
           >
             <CardContent>
               <div className="text-5xl mb-4">{servicio.icono}</div>
-              <h2 className="text-2xl font-semibold mb-2 text-yellow-300">
+              <h2 className="text-2xl font-semibold mb-2 text-teal-200">
                 {servicio.titulo}
               </h2>
-              <p className="text-green-100">{servicio.descripcion}</p>
+              <p className="text-teal-100">{servicio.descripcion}</p>
             </CardContent>
           </Card>
         ))}

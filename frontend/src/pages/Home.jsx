@@ -5,14 +5,14 @@ export default function Home() {
     <div className="min-h-screen">
       {/* HERO SECTION */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-600/20 via-blue-600/10 to-purple-600/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-600/20 via-teal-500/15 to-cyan-600/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
                   Conectando el futuro con{" "}
-                  <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
                     Biotecnología
                   </span>
                 </h1>
@@ -25,7 +25,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/unete"
-                  className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+                  className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
                 >
                   Únete Ahora
                 </Link>
@@ -39,7 +39,7 @@ export default function Home() {
             </div>
             
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-blue-400/20 rounded-3xl blur-3xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-cyan-400/20 rounded-3xl blur-3xl"></div>
               <img
                 src="/img1corporativo.jpg"
                 alt="Bioconecta Innovation"
@@ -107,7 +107,7 @@ export default function Home() {
               { number: "99%", label: "Satisfacción Cliente" }
             ].map((stat, index) => (
               <div key={index} className="space-y-2">
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   {stat.number}
                 </div>
                 <div className="text-gray-300 font-medium">
@@ -120,7 +120,7 @@ export default function Home() {
       </section>
 
       {/* CTA SECTION */}
-      <section className="py-20 bg-gradient-to-r from-teal-600/10 to-blue-600/10">
+      <section className="py-20 bg-gradient-to-r from-teal-600/10 to-cyan-600/10">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             ¿Listo para transformar el futuro?
@@ -131,13 +131,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
-              className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
               Comienza Ahora
             </Link>
             <Link
               to="/servicios"
-              className="border-2 border-gray-400 text-gray-300 hover:border-white hover:text-white font-semibold px-8 py-4 rounded-full transition-all duration-300"
+              className="border-2 border-teal-400 text-teal-400 hover:border-teal-300 hover:text-teal-300 font-semibold px-8 py-4 rounded-full transition-all duration-300"
             >
               Ver Servicios
             </Link>

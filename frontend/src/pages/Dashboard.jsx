@@ -38,7 +38,11 @@ export default function Dashboard() {
           <Item to="/proyectos" label="CREAR PROYECTO" icon="+" />
           <Item to="#" label="AGENDA" icon="📅" />
           <Item to="/proyectos" label="PROYECTOS" icon="✓" />
+          <Item to="/historial" label="HISTORIAL" icon="📊" />
+          <Item to="/tareas" label="TAREAS" icon="📋" />
+          <Item to="/reportes" label="REPORTES" icon="📈" />
           <Item to="/perfil" label="PERFIL" icon="👤" />
+          <Item to="/logs" label="LOGS" icon="🔍" />
         </div>
 
         <hr className="my-8 border-gray-300" />

@@ -18,6 +18,7 @@ export default function Navbar() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/proyectos", label: "Proyectos" },
     { href: "/tareas", label: "Tareas" },
+    { href: "/historial", label: "Historial" },
     { href: "/reportes", label: "Reportes" },
   ];
 

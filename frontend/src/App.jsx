@@ -13,6 +13,7 @@ import Servicios from "./pages/Servicios";
 import Tareas from "./pages/Tareas.jsx";
 import Reportes from "./pages/Reportes.jsx";
 import Logs from "./pages/Logs.jsx";
+import Historial from "./pages/Historial.jsx";
 import PoliticaPrivacidad from "./pages/PoliticaPrivacidad.jsx";
 import TerminosUso from "./pages/TerminosUso.jsx";
 
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/tareas" element={<Tareas />} />
           <Route path="/reportes" element={<Reportes />} />
           <Route path="/logs" element={<Logs />} />
+          <Route path="/historial" element={<Historial />} />
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/terminos-uso" element={<TerminosUso />} />
           <Route path="*" element={
