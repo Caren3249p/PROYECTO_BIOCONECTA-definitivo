@@ -9,7 +9,7 @@ import { RolesModule } from './roles/roles.module';
 import { TareasModule } from './tareas/tareas.module';
 import { HitosModule } from './Hitos/hitos.module';
 import { DocumentosModule } from './Documentos/documentos.module';
-import { LogsModule } from '../logs/logs.module';
+import { LogsModule } from './Documentos/logs/logs.module';
 import { ReservasModule } from './reservas/reservas.module';
 import { MetricasModule } from '../metricas/metricas.module';
 import { HistorialParticipacionModule } from '../historial-participacion/historial-participacion.module';

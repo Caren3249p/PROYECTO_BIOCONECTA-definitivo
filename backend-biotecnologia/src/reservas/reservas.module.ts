@@ -6,7 +6,7 @@ import { Reserva } from './reserva.entity';
 import { Servicio } from '../servicios/servicio.entity';
 import { Usuario } from '../usuarios/usuarios.entity';
 import { Asistencia } from '../asistencia/asistencia/asistencia.entity'; // 👈 IMPORTANTE
-import { LogsModule } from '../../logs/logs.module';
+import { LogsModule } from '../Documentos/logs/logs.module';
 import { NotificacionesModule } from '../Notificaciones/notificaciones/notificaciones.module';
 
 @Module({

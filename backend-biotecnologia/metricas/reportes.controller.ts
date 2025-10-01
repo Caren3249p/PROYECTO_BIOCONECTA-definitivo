@@ -6,7 +6,7 @@ import { Roles } from '../src/auth/roles.decorator';
 import { MetricasService } from './metricas.service';
 import { ReportesService } from './reportes.service';
 import { ExportService } from './export.service';
-import { LogsService } from '../logs/logs.service';
+import { LogsService } from '../src/Documentos/logs/logs.service';
 
 @Controller('reportes')
 @UseGuards(JwtAuthGuard)
