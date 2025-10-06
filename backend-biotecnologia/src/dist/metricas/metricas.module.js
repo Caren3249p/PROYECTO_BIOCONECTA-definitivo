@@ -19,7 +19,7 @@ const metricas_service_1 = require("./metricas.service");
 const reportes_service_1 = require("./reportes.service");
 const export_service_1 = require("./export.service");
 const reportes_controller_1 = require("./reportes.controller");
-const logs_module_1 = require("../logs/logs.module");
+const logs_module_1 = require("../src/logs/logs.module");
 let MetricasModule = class MetricasModule {
 };
 exports.MetricasModule = MetricasModule;

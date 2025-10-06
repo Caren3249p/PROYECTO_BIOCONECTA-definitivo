@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import { MetricasService } from './metricas.service';
 import { ReportesService } from './reportes.service';
 import { ExportService } from './export.service';
-import { LogsService } from '../logs/logs.service';
+import { LogsService } from '../src/logs/logs.service';
 export declare class ReportesController {
     private readonly metricasService;
     private readonly reportesService;

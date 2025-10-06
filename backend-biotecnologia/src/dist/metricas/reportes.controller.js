@@ -20,7 +20,7 @@ const roles_decorator_1 = require("../src/auth/roles.decorator");
 const metricas_service_1 = require("./metricas.service");
 const reportes_service_1 = require("./reportes.service");
 const export_service_1 = require("./export.service");
-const logs_service_1 = require("../logs/logs.service");
+const logs_service_1 = require("../src/logs/logs.service");
 let ReportesController = class ReportesController {
     metricasService;
     reportesService;

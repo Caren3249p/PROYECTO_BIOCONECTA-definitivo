@@ -1,4 +1,4 @@
-import { LogsService } from '../../logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 export declare class ReservasController {

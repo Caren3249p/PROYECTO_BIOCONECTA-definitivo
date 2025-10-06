@@ -14,7 +14,7 @@ const tareas_controller_1 = require("./tareas.controller");
 const tarea_entity_1 = require("./tarea.entity");
 const proyectos_entity_1 = require("../proyectos/proyectos.entity");
 const usuarios_entity_1 = require("../usuarios/usuarios.entity");
-const logs_module_1 = require("../../logs/logs.module");
+const logs_module_1 = require("../logs/logs.module");
 let TareasModule = class TareasModule {
 };
 exports.TareasModule = TareasModule;

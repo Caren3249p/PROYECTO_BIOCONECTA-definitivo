@@ -16,7 +16,7 @@ exports.ProyectosController = void 0;
 const common_1 = require("@nestjs/common");
 const proyectos_service_1 = require("./proyectos.service");
 const create_proyecto_dto_1 = require("./dto/create-proyecto.dto");
-const logs_service_1 = require("../../logs/logs.service");
+const logs_service_1 = require("../logs/logs.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let ProyectosController = class ProyectosController {
     proyectosService;

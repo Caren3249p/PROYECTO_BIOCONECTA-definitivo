@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReservasController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const logs_service_1 = require("../../logs/logs.service");
+const logs_service_1 = require("../logs/logs.service");
 const reservas_service_1 = require("./reservas.service");
 const create_reserva_dto_1 = require("./dto/create-reserva.dto");
 const roles_guard_1 = require("../auth/roles.guard");

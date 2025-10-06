@@ -12,7 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const servicios_controller_1 = require("./servicios.controller");
 const servicios_service_1 = require("./servicios.service");
 const servicio_entity_1 = require("./servicio.entity");
-const logs_module_1 = require("../../logs/logs.module");
+const logs_module_1 = require("../logs/logs.module");
 let ServiciosModule = class ServiciosModule {
 };
 exports.ServiciosModule = ServiciosModule;

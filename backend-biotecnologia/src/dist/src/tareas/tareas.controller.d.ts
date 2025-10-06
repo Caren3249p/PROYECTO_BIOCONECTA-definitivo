@@ -1,4 +1,4 @@
-import { LogsService } from '../../logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { TareasService } from './tareas.service';
 import { Tarea } from './tarea.entity';
 import { CreateTareaDto } from './dto/create-tarea.dto';

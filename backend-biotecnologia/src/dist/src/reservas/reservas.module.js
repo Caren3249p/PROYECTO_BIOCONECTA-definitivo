@@ -15,7 +15,7 @@ const reserva_entity_1 = require("./reserva.entity");
 const servicio_entity_1 = require("../servicios/servicio.entity");
 const usuarios_entity_1 = require("../usuarios/usuarios.entity");
 const asistencia_entity_1 = require("../asistencia/asistencia/asistencia.entity");
-const logs_module_1 = require("../../logs/logs.module");
+const logs_module_1 = require("../logs/logs.module");
 const notificaciones_module_1 = require("../Notificaciones/notificaciones/notificaciones.module");
 let ReservasModule = class ReservasModule {
 };

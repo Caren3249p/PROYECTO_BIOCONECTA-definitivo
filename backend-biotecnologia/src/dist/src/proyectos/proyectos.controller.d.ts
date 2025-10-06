@@ -1,7 +1,7 @@
 import { ProyectosService } from './proyectos.service';
 import { Proyecto } from './proyectos.entity';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
-import { LogsService } from '../../logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 export declare class ProyectosController {
     private readonly proyectosService;
     private readonly logsService;

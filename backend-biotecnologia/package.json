@@ -4,7 +4,11 @@
   "scripts": {
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:prod": "node dist/main"
+    "build": "nest build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -16,18 +20,29 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
     "mysql2": "^3.0.0",
     "nodemailer": "^7.0.6",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pdfkit": "^0.17.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
+    "@nestjs/testing": "^10.4.20",
     "@types/bcrypt": "^5.0.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.7.0",
     "@types/nodemailer": "^7.0.2",
     "@types/passport-jwt": "^3.0.8",
+    "@types/pdfkit": "^0.17.3",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
     "typescript": "^5.3.0"
   }
 }

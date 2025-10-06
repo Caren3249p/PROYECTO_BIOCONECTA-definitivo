@@ -1,4 +1,4 @@
-import { LogsService } from '../../logs/logs.service';
+import { LogsService } from '../logs/logs.service';
 import { ServiciosService } from './servicios.service';
 import { Servicio } from './servicio.entity';
 import { CreateServicioDto } from './dto/create-servicio.dto';

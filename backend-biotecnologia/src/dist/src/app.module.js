@@ -1,24 +1,50 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const usuarios_module_1 = require("./usuarios/usuarios.module");
+const dotenv = __importStar(require("dotenv"));
 const auth_module_1 = require("./auth/auth.module");
-const proyectos_module_1 = require("./proyectos/proyectos.module");
-const servicios_module_1 = require("./servicios/servicios.module");
-const roles_module_1 = require("./roles/roles.module");
-const tareas_module_1 = require("./tareas/tareas.module");
-const hitos_module_1 = require("./Hitos/hitos.module");
-const documentos_module_1 = require("./Documentos/documentos.module");
-const logs_module_1 = require("../logs/logs.module");
-const reservas_module_1 = require("./reservas/reservas.module");
+dotenv.config();
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,24 +53,15 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
-                host: 'localhost',
-                port: 3306,
-                username: 'biotec',
-                password: 'oki31xdc!#biotec',
-                database: 'mydb',
-                autoLoadEntities: true,
+                host: process.env.DB_HOST || '127.0.0.1',
+                port: parseInt(process.env.DB_PORT || '3306', 10),
+                username: process.env.DB_USER || 'root',
+                password: process.env.DB_PASS || '',
+                database: process.env.DB_NAME || 'test',
+                entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: true,
             }),
-            usuarios_module_1.UsuariosModule,
             auth_module_1.AuthModule,
-            proyectos_module_1.ProyectosModule,
-            servicios_module_1.ServiciosModule,
-            roles_module_1.RolesModule,
-            tareas_module_1.TareasModule,
-            hitos_module_1.HitosModule,
-            documentos_module_1.DocumentosModule,
-            logs_module_1.LogsModule,
-            reservas_module_1.ReservasModule,
         ],
     })
 ], AppModule);

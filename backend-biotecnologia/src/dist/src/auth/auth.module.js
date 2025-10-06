@@ -8,24 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("@nestjs/jwt");
-const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
-const usuarios_module_1 = require("../usuarios/usuarios.module");
+const typeorm_1 = require("@nestjs/typeorm");
+const sysuser_entity_1 = require("../entities/sysuser.entity");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            passport_1.PassportModule,
-            jwt_1.JwtModule.register({
-                secret: 'mi_clave_secreta',
-                signOptions: { expiresIn: '1h' },
-            }),
-            usuarios_module_1.UsuariosModule,
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([sysuser_entity_1.SysUser])],
         providers: [auth_service_1.AuthService],
         controllers: [auth_controller_1.AuthController],
     })

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TareasController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const logs_service_1 = require("../../logs/logs.service");
+const logs_service_1 = require("../logs/logs.service");
 const tareas_service_1 = require("./tareas.service");
 const create_tarea_dto_1 = require("./dto/create-tarea.dto");
 const roles_guard_1 = require("../auth/roles.guard");
