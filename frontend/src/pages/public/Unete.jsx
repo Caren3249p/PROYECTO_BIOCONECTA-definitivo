@@ -1,6 +1,8 @@
 // src/pages/Unete.jsx
 import React from "react";
-import Button from "../components/botton";
+import { Button } from "../../components/ui/button.jsx";
+
+
 
 export default function Unete() {
   return (

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer.jsx"; // 👈 importa el Footer
+import React from "react";
 
 const Item = ({ to, label, icon }) => (
   <Link to={to} className="group block">
@@ -67,8 +66,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 👇 Footer siempre visible abajo */}
-      <Footer />
     </main>
   );
 }

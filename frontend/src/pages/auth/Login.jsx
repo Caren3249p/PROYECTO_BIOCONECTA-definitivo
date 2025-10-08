@@ -1,5 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
+import { login as loginApi } from "../../servicios/login";
 import { useState } from "react";
+import React from "react";
+
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", pass: "" });
@@ -17,20 +20,15 @@ export default function Login() {
     setLoading(true);
     
     try {
-      const res = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.pass }),
-      });
-      const data = await res.json();
+      const { ok, access_token, user, message } = await loginApi(form.email, form.pass);
       
-      if (res.ok && data.access_token) {
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("rol", data.rol || "Usuario");
+      if (ok && access_token) {
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("rol", (user?.rol) || "Usuario");
         setMensaje("¡Login exitoso! Redirigiendo...");
         setTimeout(() => navigate("/dashboard"), 1500);
       } else {
-        setMensaje(data.message || "Credenciales incorrectas");
+        setMensaje(message || "Credenciales incorrectas");
       }
     } catch {
       setMensaje("Error de conexión con el servidor");
@@ -113,26 +111,6 @@ export default function Login() {
             </div>
           </form>
 
-          {/* Botones de prueba */}
-          <div className="mt-8 pt-6 border-t border-gray-700">
-            <p className="text-center text-sm text-gray-400 mb-4">Acceso de prueba:</p>
-            <div className="space-y-2">
-              {[
-                { rol: "Estudiante", color: "from-green-500 to-emerald-500" },
-                { rol: "Asesor", color: "from-blue-500 to-indigo-500" },
-                { rol: "Administrador", color: "from-purple-500 to-pink-500" }
-              ].map(({ rol, color }) => (
-                <button 
-                  key={rol}
-                  type="button" 
-                  className={`w-full bg-gradient-to-r ${color} hover:opacity-90 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm`}
-                  onClick={() => loginPrueba(rol)}
-                >
-                  Demo como {rol}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {mensaje && (
             <div className={`mt-4 p-3 rounded-lg text-center text-sm ${

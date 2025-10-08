@@ -1,5 +1,6 @@
 // src/pages/Servicios.jsx
-import { Card, CardContent } from "../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
+import React from "react";
 
 export default function Servicios() {
   const servicios = [

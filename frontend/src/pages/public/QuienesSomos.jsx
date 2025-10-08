@@ -1,5 +1,6 @@
 // src/pages/QuienesSomos.jsx
-import Footer from "../components/Footer.jsx";
+
+import React from "react";
 
 export default function QuienesSomos() {
   return (
@@ -45,8 +46,6 @@ export default function QuienesSomos() {
         </div>
       </div>
 
-      {/* Footer siempre abajo */}
-      <Footer />
     </main>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ProyectoTareas from "../components/ProyectoTareas";
+import ProyectoTareas from "../../components/ProyectoTareas";
 
 
 export default function Proyectos() {

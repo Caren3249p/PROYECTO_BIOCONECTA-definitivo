@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardContent } from '../components/ui/card.jsx';
+import { Card, CardHeader, CardContent } from "../../components/ui/card.jsx";
+
 
 const Reportes = () => {
   const [reportes, setReportes] = useState([]);

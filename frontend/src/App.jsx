@@ -1,56 +1,72 @@
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Perfil from "./pages/Perfil.jsx";
-import Proyectos from "./pages/Proyectos.jsx";
-import QuienesSomos from "./pages/quienessomos.jsx";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Unete from "./pages/Unete";
-import Servicios from "./pages/Servicios";
-import Tareas from "./pages/Tareas.jsx";
-import Reportes from "./pages/Reportes.jsx";
-import Logs from "./pages/Logs.jsx";
-import Historial from "./pages/Historial.jsx";
-import PoliticaPrivacidad from "./pages/PoliticaPrivacidad.jsx";
-import TerminosUso from "./pages/TerminosUso.jsx";
+import Footer from "./components/Footer.jsx";
+
+// 🔐 Autenticación
+import Login from "./pages/auth/Login.jsx";
+import Register from "./pages/auth/Register.jsx";
+import Perfil from "./pages/auth/Perfil.jsx";
+
+// 🧠 Dashboard y módulos internos
+import Dashboard from "./pages/dashboard/Dashboard.jsx";
+import Proyectos from "./pages/dashboard/Proyectos.jsx";
+import Reportes from "./pages/dashboard/Reportes.jsx";
+import Tareas from "./pages/dashboard/Tareas.jsx";
+import Historial from "./pages/dashboard/Historial.jsx";
+import Logs from "./pages/dashboard/Logs.jsx";
+import Interfaz from "./pages/dashboard/Interfaz.jsx";
+
+// 🌐 Páginas públicas
+import Home from "./pages/public/Home.jsx";
+import QuienesSomos  from "./pages/public/quienessomos.jsx";
+import Servicios from "./pages/public/Servicios.jsx";
+import Unete from "./pages/public/Unete.jsx";
+
+// 📜 Páginas legales
+import PoliticaPrivacidad from "./pages/legal/PoliticaPrivacidad.jsx";
+import TerminosUso from "./pages/legal/TerminosUso.jsx";
 
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <Navbar />
+
       <main className="flex-1">
         <Routes>
+          {/* Página inicial */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
+          {/* Otras rutas */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/perfil" element={<Perfil />} />
           <Route path="/proyectos" element={<Proyectos />} />
-          <Route path="/quienes-somos" element={<QuienesSomos />} />
           <Route path="/servicios" element={<Servicios />} />
           <Route path="/unete" element={<Unete />} />
-          <Route path="/tareas" element={<Tareas />} />
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/logs" element={<Logs />} />
-          <Route path="/historial" element={<Historial />} />
+          <Route path="/quienes-somos" element={<QuienesSomos />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/terminos-uso" element={<TerminosUso />} />
-          <Route path="*" element={
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="text-center">
-                <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-                <p className="text-xl text-gray-300 mb-8">Página no encontrada</p>
-                <Navigate to="/" />
+          <Route path="/perfil" element={<Perfil />} />
+
+          {/* Página 404 */}
+          <Route
+            path="*"
+            element={
+              <div className="flex items-center justify-center min-h-screen text-center text-white">
+                <div>
+                  <h1 className="text-6xl font-bold mb-4">404</h1>
+                  <p className="text-xl mb-8 text-gray-300">Página no encontrada</p>
+                  <Navigate to="/" replace />
+                </div>
               </div>
-            </div>
-          } />
+            }
+          />
         </Routes>
       </main>
+
+      {/* 👇 Solo un Footer aquí */}
       <Footer />
     </div>
   );
 }
-
