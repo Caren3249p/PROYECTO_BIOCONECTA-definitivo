@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, OneToMany, CreateDateColumn } from 'typeorm';
 import { Servicio } from '../servicios/servicio.entity';
-import { Usuario } from '../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { Asistencia } from '../asistencia/asistencia/asistencia.entity';
 
 
@@ -12,8 +12,8 @@ export class Reserva {
   @ManyToOne(() => Servicio, { eager: true })
   servicio: Servicio;
 
-  @ManyToOne(() => Usuario, { eager: true })
-  usuario: Usuario;
+  @ManyToOne(() => User, { eager: true })
+  usuario: User;
 
   @CreateDateColumn()
   fechaReserva: Date;

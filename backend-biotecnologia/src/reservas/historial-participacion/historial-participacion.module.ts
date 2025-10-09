@@ -5,12 +5,12 @@ import { HistorialParticipacionService } from './historial-participacion.service
 import { ReportesHistorialController } from './reportes-historial.controller';
 import { ReportesHistorialService } from './reportes-historial.service';
 import { HistorialParticipacion } from './historial-participacion.entity';
-import { Usuario } from '../../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { Proyecto } from '../../proyectos/proyectos.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([HistorialParticipacion, Usuario, Proyecto])
+    TypeOrmModule.forFeature([HistorialParticipacion, User, Proyecto])
   ],
   controllers: [HistorialParticipacionController, ReportesHistorialController],
   providers: [HistorialParticipacionService, ReportesHistorialService],

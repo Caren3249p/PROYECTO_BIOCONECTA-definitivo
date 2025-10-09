@@ -1,35 +1,22 @@
-// ✅ frontend/src/servicios/register.js
-export async function register(userData) {
-  try {
-    const payload = {
-      userName: userData.userName || 'Usuario',
-      userLastname: userData.userLastname || '',
-      email: userData.email,
-      password: userData.password,
-      userRole_iduserRole: userData.userRole_iduserRole || 1,
-      userStatus_iduserStatus: userData.userStatus_iduserStatus || 1,
-      company_idcompany: userData.company_idcompany || 1,
-    };
+const API_URL = "http://localhost:3000/auth/register";
 
-    const response = await fetch("http://localhost:3000/usuarios/register", {
+export async function register(data) {
+  try {
+    const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
-      return { ok: false, message: data.message || "Error al registrar usuario" };
-    }
+    console.log("📩 Respuesta del backend:", result);
 
-    return { ok: true, message: "Registro exitoso", user: data.user || data };
+    if (!response.ok) throw new Error(result.message || "Error al registrar");
+
+    return result;
   } catch (error) {
-    console.error("❌ Error en register:", error);
-    return { ok: false, message: "Error de conexión con el servidor" };
+    console.error("❌ Error al conectar con el backend:", error);
+    throw error;
   }
 }
-
-export default register;

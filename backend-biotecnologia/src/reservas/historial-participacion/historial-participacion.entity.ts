@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
-import { Usuario } from '../../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { Proyecto } from '../../proyectos/proyectos.entity';
 
 export enum TipoParticipacion {
@@ -18,8 +18,8 @@ export class HistorialParticipacion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Usuario, { eager: true })
-  usuario: Usuario;
+  @ManyToOne(() => User, { eager: true })
+  usuario: User;
 
   @Column({
     type: 'enum',

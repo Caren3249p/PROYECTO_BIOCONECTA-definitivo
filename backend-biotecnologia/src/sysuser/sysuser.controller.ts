@@ -10,7 +10,12 @@ export class SysUserController {
   @Post('register')
   async register(@Body() userData: Partial<User>) {
     try {
-      const user = await this.service.register(userData); // ✅ usa 'register', no 'create'
+      const user = await this.service.create(userData as {
+        userName: string;
+        userLastname: string;
+        email: string;
+        password: string;
+      }); // ✅ conversión explícita
       return { ok: true, user };
     } catch (error) {
       console.error('❌ Error en register:', error);

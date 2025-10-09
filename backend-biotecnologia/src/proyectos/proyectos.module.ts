@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProyectosService } from './proyectos.service';
-import { ProyectosController } from './proyectos.controller';
 import { Proyecto } from './proyectos.entity';
-import { LogsModule } from '../logs/logs.module'; // 👈 importamos LogsModule
+import { ProyectoService } from './proyectos.service';
+import { ProyectoController } from './proyectos.controller';
+import { Tarea } from '../tareas/tarea.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Proyecto]),
-    LogsModule, // 👈 necesario para usar LogsService en el controlador
-  ],
-  providers: [ProyectosService],
-  controllers: [ProyectosController],
+  imports: [TypeOrmModule.forFeature([Proyecto, Tarea])],
+  controllers: [ProyectoController],
+  providers: [ProyectoService],
+  exports: [ProyectoService],
 })
-export class ProyectosModule {}
+export class ProyectosModule {} // 👈 en plural

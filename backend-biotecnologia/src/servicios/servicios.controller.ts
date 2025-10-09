@@ -1,64 +1,33 @@
-import { 
-  Controller, Get, Post, Put, Body, Param, Delete, 
-  UsePipes, ValidationPipe, Req, UseGuards 
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { LogsService } from '../logs/logs.service';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { ServiciosService } from './servicios.service';
 import { Servicio } from './servicio.entity';
-import { CreateServicioDto } from './dto/create-servicio.dto';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
 
 @Controller('servicios')
 export class ServiciosController {
-  constructor(
-    private readonly serviciosService: ServiciosService,
-    private readonly logsService: LogsService, // 👈 sin @Inject
-  ) {}
+  constructor(private readonly serviciosService: ServiciosService) {}
 
   @Get()
-  findAll(): Promise<Servicio[]> {
-    return this.serviciosService.findAll();
+  listarTodos() {
+    return this.serviciosService.listarTodos();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Servicio> {
-    return this.serviciosService.findOne(Number(id));
+  buscarPorId(@Param('id') id: number) {
+    return this.serviciosService.buscarPorId(id);
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Administrador')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body() data: CreateServicioDto, @Req() req): Promise<Servicio> {
-    const servicio = await this.serviciosService.create(data);
-    const usuario = req.user?.email || 'anonimo';
-    await this.logsService.registrar(usuario, 'Creó un servicio');
-    return servicio;
+  crear(@Body() datos: Partial<Servicio>) {
+    return this.serviciosService.crear(datos);
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Administrador')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async update(
-    @Param('id') id: string, 
-    @Body() data: Partial<CreateServicioDto>, 
-    @Req() req
-  ): Promise<Servicio> {
-    const servicio = await this.serviciosService.update(Number(id), data);
-    const usuario = req.user?.email || 'anonimo';
-    await this.logsService.registrar(usuario, `Editó el servicio ${id}`);
-    return servicio;
+  actualizar(@Param('id') id: number, @Body() datos: Partial<Servicio>) {
+    return this.serviciosService.actualizar(id, datos);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Administrador')
-  async remove(@Param('id') id: string, @Req() req): Promise<void> {
-    await this.serviciosService.remove(Number(id));
-    const usuario = req.user?.email || 'anonimo';
-    await this.logsService.registrar(usuario, `Eliminó el servicio ${id}`);
+  eliminar(@Param('id') id: number) {
+    return this.serviciosService.eliminar(id);
   }
 }

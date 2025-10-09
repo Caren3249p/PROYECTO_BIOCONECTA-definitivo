@@ -1,54 +1,33 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Param, 
-  Delete, 
-  UsePipes, 
-  ValidationPipe, 
-  Req, 
-  UseGuards 
-} from '@nestjs/common';
-import { ProyectosService } from './proyectos.service';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { ProyectoService } from './proyectos.service';
 import { Proyecto } from './proyectos.entity';
-import { CreateProyectoDto } from './dto/create-proyecto.dto';
-import { LogsService } from '../logs/logs.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-
 
 @Controller('proyectos')
-export class ProyectosController {
-  constructor(
-    private readonly proyectosService: ProyectosService,
-    private readonly logsService: LogsService, // 👈 ya no necesitas @Inject
-  ) {}
+export class ProyectoController {
+  constructor(private readonly proyectoService: ProyectoService) {}
 
   @Get()
-  findAll(): Promise<Proyecto[]> {
-    return this.proyectosService.findAll();
+  findAll() {
+    return this.proyectoService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Proyecto | null> {
-    return this.proyectosService.findOne(Number(id));
+  findOne(@Param('id') id: number) {
+    return this.proyectoService.findOne(id);
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body() data: CreateProyectoDto, @Req() req): Promise<Proyecto> {
-    const proyecto = await this.proyectosService.create(data);
-    const usuario = req.user?.email || 'anonimo';
-    await this.logsService.registrar(usuario, 'Creó un proyecto');
-    return proyecto;
+  create(@Body() data: Partial<Proyecto>) {
+    return this.proyectoService.create(data);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: number, @Body() data: Partial<Proyecto>) {
+    return this.proyectoService.update(id, data);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: string, @Req() req): Promise<void> {
-    await this.proyectosService.remove(Number(id));
-    const usuario = req.user?.email || 'anonimo';
-    await this.logsService.registrar(usuario, `Eliminó proyecto ${id}`);
+  remove(@Param('id') id: number) {
+    return this.proyectoService.remove(id);
   }
 }

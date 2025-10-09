@@ -3,7 +3,8 @@ import { MetricasService } from './metricas.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Proyecto } from '../src/proyectos/proyectos.entity';
-import { Usuario } from '../src/usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
+
 import { MetricaProyecto } from './metrica-proyecto.entity';
 
 export interface ReporteTemplate {
@@ -106,8 +107,8 @@ export class ReportesService {
     private readonly metricasService: MetricasService,
     @InjectRepository(Proyecto)
     private readonly proyectoRepository: Repository<Proyecto>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(User)
+    private readonly usuarioRepository: Repository<User>,
   ) {}
 
   obtenerPlantillas(): { [key: string]: ReporteTemplate } {
@@ -407,7 +408,7 @@ export class ReportesService {
       const eficiencia = 0; // Se calcularía basado en datos reales
 
       productividad.push({
-        usuario: usuario.nombre || `Usuario ID: ${usuario.id}`,
+       usuario: usuario.userName || `Usuario ID: ${usuario.idsysuser}`,
         tareasCompletadas,
         horasTrabajo: horasTrabajo || 0,
         eficiencia

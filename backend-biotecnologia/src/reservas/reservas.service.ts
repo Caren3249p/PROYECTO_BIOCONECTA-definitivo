@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reserva } from './reserva.entity';
 import { Servicio } from '../servicios/servicio.entity';
-import { Usuario } from '../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { NotificacionesService } from '../Notificaciones/notificaciones/notificaciones.service';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class ReservasService {
     private readonly reservaRepository: Repository<Reserva>,
     @InjectRepository(Servicio)
     private readonly servicioRepository: Repository<Servicio>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(User)
+    private readonly usuarioRepository: Repository<User>,
     private readonly notificacionesService: NotificacionesService, // 👈 se inyecta aquí
   ) {}
 
@@ -28,7 +28,7 @@ export class ReservasService {
     }
 
     const servicio = await this.servicioRepository.findOneBy({ id: data.servicioId });
-    const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
+   const usuario = await this.usuarioRepository.findOneBy({ idsysuser: data.usuarioId });
 
     if (!servicio || !usuario) {
       throw new BadRequestException('Servicio o usuario no encontrado');
@@ -47,7 +47,7 @@ export class ReservasService {
     await this.notificacionesService.enviarCorreo(
       usuario.email, // 👈 asegúrate que tu entidad Usuario tiene "email"
       'Confirmación de Reserva',
-      `Hola ${usuario.nombre}, tu reserva para el servicio "${servicio.nombre}" el día ${data.fechaServicio} ha sido registrada exitosamente.`,
+      `Hola ${usuario.userName}, tu reserva para el servicio ""${servicio.nombreServicio}"" el día ${data.fechaServicio} ha sido registrada exitosamente.`
     );
 
     return reservaGuardada;

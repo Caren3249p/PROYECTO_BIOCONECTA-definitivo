@@ -3,51 +3,58 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tarea } from './tarea.entity';
 import { Proyecto } from '../proyectos/proyectos.entity';
-import { Usuario } from '../usuarios/usuarios.entity';
+import { User } from '../sysuser/sysuser.entity';
+import { CrearTareaDto } from './dto/crear-tarea.dto';
 
 @Injectable()
 export class TareasService {
   constructor(
     @InjectRepository(Tarea)
-    private readonly tareaRepository: Repository<Tarea>,
+    private readonly tareaRepositorio: Repository<Tarea>,
     @InjectRepository(Proyecto)
-    private readonly proyectoRepository: Repository<Proyecto>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    private readonly proyectoRepositorio: Repository<Proyecto>,
+    @InjectRepository(User)
+    private readonly usuarioRepositorio: Repository<User>,
   ) {}
 
+  // 📋 Mostrar todas las tareas
   findAll(): Promise<Tarea[]> {
-    return this.tareaRepository.find({ relations: ['proyecto', 'usuario'] });
+    return this.tareaRepositorio.find({ relations: ['proyecto', 'usuario'] });
   }
 
+  // 🔍 Buscar una tarea por ID
   findOne(id: number): Promise<Tarea | null> {
-    return this.tareaRepository.findOne({
-      where: { id },
-      relations: ['proyecto', 'usuario'],
+    return this.tareaRepositorio.findOne({ where: { id }, relations: ['proyecto', 'usuario'] });
+  }
+
+  // ➕ Crear una nueva tarea
+  async create(data: CrearTareaDto): Promise<Tarea> {
+    const proyecto = await this.proyectoRepositorio.findOne({ where: { id: data.proyectoId } });
+
+    const usuario = await this.usuarioRepositorio.findOne({ where: { idsysuser: data.usuarioId } });
+
+    if (!proyecto || !usuario) {
+      throw new Error('Proyecto o Usuario no encontrado');
+    }
+
+    const nuevaTarea = this.tareaRepositorio.create({
+      descripcion: data.descripcion,
+      estado: data.estado || 'pendiente',
+      proyecto,
+      usuario,
     });
+
+    return await this.tareaRepositorio.save(nuevaTarea);
   }
 
-  async create(data: { descripcion: string; proyectoId: number; usuarioId: number; estado?: string }): Promise<Tarea> {
-    const proyecto = await this.proyectoRepository.findOneBy({ id: data.proyectoId });
-    const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
-      if (!proyecto || !usuario) {
-        throw new Error('Proyecto o Usuario no encontrado');
-      }
-      const tarea = this.tareaRepository.create({
-        descripcion: data.descripcion,
-        estado: data.estado || 'pendiente',
-        proyecto: proyecto,
-        usuario: usuario,
-      });
-      return await this.tareaRepository.save(tarea);
-  }
-
+  // ✏️ Actualizar una tarea
   async update(id: number, data: Partial<Tarea>): Promise<Tarea | null> {
-    await this.tareaRepository.update(id, data);
-    return await this.findOne(id);
+    await this.tareaRepositorio.update(id, data);
+    return this.findOne(id);
   }
 
+  // 🗑️ Eliminar una tarea
   async remove(id: number): Promise<void> {
-    await this.tareaRepository.delete(id);
+    await this.tareaRepositorio.delete(id);
   }
 }

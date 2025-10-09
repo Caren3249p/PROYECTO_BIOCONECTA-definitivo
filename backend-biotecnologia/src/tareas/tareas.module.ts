@@ -3,16 +3,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TareasService } from './tareas.service';
 import { TareasController } from './tareas.controller';
 import { Tarea } from './tarea.entity';
-import { Proyecto } from '../proyectos/proyectos.entity';  // 👈 importa la entidad Proyecto
-import { Usuario } from '../usuarios/usuarios.entity';      // 👈 importa la entidad Usuario
+import { Proyecto } from '../proyectos/proyectos.entity';
+import {User } from '../sysuser/sysuser.entity';
 import { LogsModule } from '../logs/logs.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Tarea, Proyecto, Usuario]), // 👈 incluye todas las entidades que uses en el service
+    TypeOrmModule.forFeature([Tarea, Proyecto, User]),
     LogsModule,
   ],
-  providers: [TareasService],
   controllers: [TareasController],
+  providers: [TareasService],
+  exports: [TareasService],
 })
 export class TareasModule {}

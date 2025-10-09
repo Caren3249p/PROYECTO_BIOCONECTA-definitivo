@@ -1,6 +1,6 @@
 import { IsString, IsInt, IsOptional } from 'class-validator';
 
-export class CreateTareaDto {
+export class CrearTareaDto {
   @IsString()
   descripcion: string;
 

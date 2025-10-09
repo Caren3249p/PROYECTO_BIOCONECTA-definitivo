@@ -1,19 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
+import { User } from '@sysuser/sysuser.entity';
 import { Reserva } from '../../reservas/reserva.entity';
-import { Usuario } from '../../usuarios/usuarios.entity';
 
-@Entity()
+@Entity('asistencia')
 export class Asistencia {
   @PrimaryGeneratedColumn()
-  id: number;
+  idasistencia: number;
 
-  @ManyToOne(() => Reserva, (reserva) => reserva.asistencias)
-  reserva: Reserva;
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'usuarioId' })
+  usuario: User; // 👈 nombre de la propiedad
 
-  @ManyToOne(() => Usuario)
-  usuario: Usuario;
+  @ManyToOne(() => Reserva, { eager: true })
+  @JoinColumn({ name: 'reservaId' })
+  reserva: Reserva; // 👈 nombre de la propiedad
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   presente: boolean;
 
   @Column({ type: 'int', nullable: true })

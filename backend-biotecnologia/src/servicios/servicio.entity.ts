@@ -1,16 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { TipoServicio } from './tipo-servicio.entity';
 
-@Entity('servicios')
+@Entity('service') // nombre real de la tabla en MySQL
 export class Servicio {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'idservice' })
   id: number;
 
-  @Column()
-  nombre: string;
+  @Column({ name: 'serviceName', type: 'varchar', length: 45 })
+  nombreServicio: string; // 👈 Este es el campo correcto (no 'nombre')
 
-  @Column({ nullable: true })
+  @Column({ name: 'description', type: 'varchar', length: 45, nullable: true })
   descripcion: string;
 
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  precio: number;
+  // Relación con tipo de servicio
+  @ManyToOne(() => TipoServicio, (tipo) => tipo.servicios)
+  @JoinColumn({ name: 'serviceType_idserviceType' })
+  tipoServicio: TipoServicio;
+
+  @Column({ name: 'company_idcompany', type: 'int', nullable: true })
+  idEmpresa: number;
 }

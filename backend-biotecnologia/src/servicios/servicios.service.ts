@@ -7,32 +7,31 @@ import { Servicio } from './servicio.entity';
 export class ServiciosService {
   constructor(
     @InjectRepository(Servicio)
-    private readonly servicioRepository: Repository<Servicio>,
+    private readonly servicioRepositorio: Repository<Servicio>,
   ) {}
 
-  findAll(): Promise<Servicio[]> {
-    return this.servicioRepository.find();
+  listarTodos() {
+    return this.servicioRepositorio.find({ relations: ['tipoServicio'] });
   }
 
-  async findOne(id: number): Promise<Servicio> {
-    const servicio = await this.servicioRepository.findOneBy({ id });
-    if (!servicio) {
-      throw new Error(`Servicio with id ${id} not found`);
-    }
-    return servicio;
+  buscarPorId(id: number) {
+    return this.servicioRepositorio.findOne({
+      where: { id },
+      relations: ['tipoServicio'],
+    });
   }
 
-  create(data: Partial<Servicio>): Promise<Servicio> {
-    const servicio = this.servicioRepository.create(data);
-    return this.servicioRepository.save(servicio);
+  crear(datos: Partial<Servicio>) {
+    const nuevo = this.servicioRepositorio.create(datos);
+    return this.servicioRepositorio.save(nuevo);
   }
 
-  async update(id: number, data: Partial<Servicio>): Promise<Servicio> {
-    await this.servicioRepository.update(id, data);
-    return this.findOne(id);
+  async actualizar(id: number, datos: Partial<Servicio>) {
+    await this.servicioRepositorio.update(id, datos);
+    return this.buscarPorId(id);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.servicioRepository.delete(id);
+  eliminar(id: number) {
+    return this.servicioRepositorio.delete(id);
   }
 }

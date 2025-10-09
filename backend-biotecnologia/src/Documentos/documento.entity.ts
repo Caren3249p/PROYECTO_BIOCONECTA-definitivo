@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Proyecto } from '../proyectos/proyectos.entity';
-import { Usuario } from '../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 
 @Entity('documentos')
 export class Documento {
@@ -16,8 +16,8 @@ export class Documento {
   @ManyToOne(() => Proyecto, { nullable: false })
   proyecto: Proyecto;
 
-  @ManyToOne(() => Usuario, { nullable: false })
-  usuario: Usuario;
+  @ManyToOne(() => User, { nullable: false })
+  usuario: User;
 
   @Column({ default: 'privado' })
   permiso: string; // 'privado' | 'publico'

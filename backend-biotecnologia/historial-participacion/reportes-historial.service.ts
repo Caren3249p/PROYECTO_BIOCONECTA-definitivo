@@ -40,11 +40,10 @@ export class ReportesHistorialService {
     // Agregar datos
     resultado.registros.forEach((registro, index) => {
       worksheet.addRow({
-        id: registro.id,
-        usuario: registro.usuario?.nombre || 'N/A',
+        usuario: registro.usuario?.userName || 'N/A',
         tipo: this.obtenerEtiquetaTipo(registro.tipoParticipacion),
         descripcion: registro.descripcion,
-        proyecto: registro.proyecto?.nombre || 'N/A',
+        proyecto: registro.proyecto?.descripcion || 'N/A',
         fecha: registro.fechaEvento.toLocaleDateString('es-ES'),
         entidadTipo: registro.entidadTipo || 'N/A',
         entidadId: registro.entidadId || 'N/A'
@@ -132,7 +131,7 @@ export class ReportesHistorialService {
     resultado.registros.forEach(registro => {
       const row = [
         registro.id,
-        `"${registro.usuario?.nombre || 'N/A'}"`,
+        `"${registro.usuario?.userName || 'N/A'}"`,
         `"${this.obtenerEtiquetaTipo(registro.tipoParticipacion)}"`,
         `"${registro.descripcion.replace(/"/g, '""')}"`,
         `"${registro.proyecto?.nombre || 'N/A'}"`,

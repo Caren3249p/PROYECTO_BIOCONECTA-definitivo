@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, FindManyOptions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { HistorialParticipacion, TipoParticipacion } from './historial-participacion.entity';
 import { FiltroHistorialDto, CrearHistorialDto } from './dto/historial-participacion.dto';
-import { Usuario } from '../../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { Proyecto } from '../../proyectos/proyectos.entity';
 
 @Injectable()
@@ -11,12 +11,15 @@ export class HistorialParticipacionService {
   constructor(
     @InjectRepository(HistorialParticipacion)
     private historialRepository: Repository<HistorialParticipacion>,
-    @InjectRepository(Usuario)
-    private usuarioRepository: Repository<Usuario>,
+
+    @InjectRepository(User)
+    private usuarioRepository: Repository<User>,
+
     @InjectRepository(Proyecto)
     private proyectoRepository: Repository<Proyecto>,
   ) {}
 
+  // ✅ FILTRAR HISTORIAL
   async obtenerHistorial(filtros: FiltroHistorialDto) {
     const { 
       usuarioId, 
@@ -34,8 +37,9 @@ export class HistorialParticipacionService {
       .leftJoinAndSelect('historial.proyecto', 'proyecto')
       .where('historial.activo = :activo', { activo: true });
 
+    // ✅ Corregido: referencia al campo correcto en la entidad User
     if (usuarioId) {
-      queryBuilder.andWhere('historial.usuario.id = :usuarioId', { usuarioId });
+      queryBuilder.andWhere('usuario.idsysuser = :usuarioId', { usuarioId });
     }
 
     if (proyectoId) {
@@ -74,15 +78,22 @@ export class HistorialParticipacionService {
     };
   }
 
+  // ✅ CREAR REGISTRO
   async crearRegistro(datos: CrearHistorialDto): Promise<HistorialParticipacion> {
-    const usuario = await this.usuarioRepository.findOne({ where: { id: datos.usuarioId } });
+    // ❌ Antes: id → ✅ Ahora: idsysuser
+    const usuario = await this.usuarioRepository.findOne({
+      where: { idsysuser: datos.usuarioId },
+    });
+
     if (!usuario) {
       throw new Error('Usuario no encontrado');
     }
 
     let proyecto: Proyecto | null = null;
     if (datos.proyectoId) {
-      proyecto = await this.proyectoRepository.findOne({ where: { id: datos.proyectoId } });
+      proyecto = await this.proyectoRepository.findOne({
+        where: { id: datos.proyectoId },
+      });
     }
 
     const registro = this.historialRepository.create({
@@ -92,19 +103,22 @@ export class HistorialParticipacionService {
       entidadTipo: datos.entidadTipo,
       entidadId: datos.entidadId,
       proyecto: proyecto || undefined,
-      metadatos: datos.metadatos
+      metadatos: datos.metadatos,
     });
 
     return await this.historialRepository.save(registro);
   }
 
+  // ✅ OBTENER ESTADÍSTICAS
   async obtenerEstadisticas(usuarioId?: number, fechaInicio?: string, fechaFin?: string) {
     const queryBuilder = this.historialRepository
       .createQueryBuilder('historial')
       .where('historial.activo = :activo', { activo: true });
 
+    // ❌ Antes: historial.usuario.id → ✅ Ahora: usuario.idsysuser
     if (usuarioId) {
-      queryBuilder.andWhere('historial.usuario.id = :usuarioId', { usuarioId });
+      queryBuilder.andWhere('usuario.idsysuser = :usuarioId', { usuarioId });
+      queryBuilder.leftJoin('historial.usuario', 'usuario');
     }
 
     if (fechaInicio && fechaFin) {
@@ -133,14 +147,15 @@ export class HistorialParticipacionService {
     return {
       total,
       estadisticasPorTipo,
-      participacionPorMes
+      participacionPorMes,
     };
   }
 
+  // ✅ TIPOS DE PARTICIPACIÓN
   async obtenerTiposParticipacion() {
     return Object.values(TipoParticipacion).map(tipo => ({
       valor: tipo,
-      etiqueta: this.obtenerEtiquetaTipo(tipo)
+      etiqueta: this.obtenerEtiquetaTipo(tipo),
     }));
   }
 
@@ -153,12 +168,12 @@ export class HistorialParticipacionService {
       [TipoParticipacion.ASISTENCIA_REGISTRADA]: 'Asistencia Registrada',
       [TipoParticipacion.PROYECTO_ASIGNADO]: 'Proyecto Asignado',
       [TipoParticipacion.HITO_COMPLETADO]: 'Hito Completado',
-      [TipoParticipacion.DOCUMENTO_SUBIDO]: 'Documento Subido'
+      [TipoParticipacion.DOCUMENTO_SUBIDO]: 'Documento Subido',
     };
     return etiquetas[tipo] || tipo;
   }
 
-  // Métodos de conveniencia para registrar eventos específicos
+  // ✅ MÉTODOS DE REGISTRO DE EVENTOS
   async registrarTareaAsignada(usuarioId: number, tareaId: number, proyectoId?: number, descripcion?: string) {
     return this.crearRegistro({
       usuarioId,
@@ -167,7 +182,7 @@ export class HistorialParticipacionService {
       entidadTipo: 'tarea',
       entidadId: tareaId,
       proyectoId,
-      metadatos: { tareaId }
+      metadatos: { tareaId },
     });
   }
 
@@ -179,7 +194,7 @@ export class HistorialParticipacionService {
       entidadTipo: 'tarea',
       entidadId: tareaId,
       proyectoId,
-      metadatos: { tareaId }
+      metadatos: { tareaId },
     });
   }
 
@@ -190,7 +205,7 @@ export class HistorialParticipacionService {
       descripcion: `Se creó una reserva${servicioNombre ? ` para ${servicioNombre}` : ''}`,
       entidadTipo: 'reserva',
       entidadId: reservaId,
-      metadatos: { reservaId, servicioNombre }
+      metadatos: { reservaId, servicioNombre },
     });
   }
 
@@ -201,7 +216,7 @@ export class HistorialParticipacionService {
       descripcion: `Se registró asistencia${servicioNombre ? ` a ${servicioNombre}` : ''}`,
       entidadTipo: 'asistencia',
       entidadId: reservaId,
-      metadatos: { reservaId, servicioNombre }
+      metadatos: { reservaId, servicioNombre },
     });
   }
 }

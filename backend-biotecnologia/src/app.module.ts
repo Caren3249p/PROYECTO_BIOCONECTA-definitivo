@@ -3,23 +3,38 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { SysUserModule } from './sysuser/sysuser.module';
 import { AuthModule } from './auth/auth.module';
+import { ServiciosModule } from './servicios/servicios.module';
+import { LogsModule } from './logs/logs.module';
+import { ProyectosModule } from './proyectos/proyectos.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT ?? '3306', 10),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      autoLoadEntities: true,
-      synchronize: false,     // ⛔ evita ALTER (no tienes permisos DDL)
-      migrationsRun: false,
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const isPublic = process.env.ENVIRONMENT === 'public';
+        const host = isPublic
+          ? process.env.DB_HOST_PUBLIC
+          : process.env.DB_HOST_PRIVATE;
+
+        return {
+          type: 'mysql',
+          host,
+          port: parseInt(process.env.DB_PORT ?? '3306', 10),
+          username: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_DATABASE,
+          autoLoadEntities: true,
+          synchronize: false,
+          logging: true,
+        };
+      },
     }),
     SysUserModule,
     AuthModule,
+    ServiciosModule,
+    LogsModule,
+    ProyectosModule, // 👈 correcto (plural)
   ],
 })
 export class AppModule {}

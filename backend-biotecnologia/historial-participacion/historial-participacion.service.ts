@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, FindManyOptions } from 'typeorm';
 import { HistorialParticipacion, TipoParticipacion } from './historial-participacion.entity';
 import { FiltroHistorialDto, CrearHistorialDto } from './dto/historial-participacion.dto';
-import { Usuario } from '../src/usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { Proyecto } from '../src/proyectos/proyectos.entity';
 
 @Injectable()
@@ -11,8 +11,8 @@ export class HistorialParticipacionService {
   constructor(
     @InjectRepository(HistorialParticipacion)
     private historialRepository: Repository<HistorialParticipacion>,
-    @InjectRepository(Usuario)
-    private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(User)
+    private usuarioRepository: Repository<User>,
     @InjectRepository(Proyecto)
     private proyectoRepository: Repository<Proyecto>,
   ) {}
@@ -75,7 +75,7 @@ export class HistorialParticipacionService {
   }
 
   async crearRegistro(datos: CrearHistorialDto): Promise<HistorialParticipacion> {
-    const usuario = await this.usuarioRepository.findOne({ where: { id: datos.usuarioId } });
+    const usuario = await this.usuarioRepository.findOne({ where: { idsysuser: datos.usuarioId } });
     if (!usuario) {
       throw new Error('Usuario no encontrado');
     }

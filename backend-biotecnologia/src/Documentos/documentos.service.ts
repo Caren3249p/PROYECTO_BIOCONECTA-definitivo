@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Documento } from './documento.entity';
 import { Proyecto } from '../proyectos/proyectos.entity';
-import { Usuario } from '../usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
 import { CreateDocumentoDto } from './dto/create-documento.dto';
 import { UpdateDocumentoDto } from './dto/update-documento.dto';
 
@@ -14,8 +14,8 @@ export class DocumentosService {
     private readonly documentoRepository: Repository<Documento>,
     @InjectRepository(Proyecto)
     private readonly proyectoRepository: Repository<Proyecto>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(User)
+    private readonly usuarioRepository: Repository<User>,
   ) {}
 
   async findAll(): Promise<Documento[]> {
@@ -33,7 +33,7 @@ export class DocumentosService {
 
   async create(data: CreateDocumentoDto): Promise<Documento> {
     const proyecto = await this.proyectoRepository.findOneBy({ id: data.proyectoId });
-    const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
+    const usuario = await this.usuarioRepository.findOneBy({ idsysuser: data.usuarioId });
     if (!proyecto) throw new NotFoundException('Proyecto no encontrado');
     if (!usuario) throw new NotFoundException('Usuario no encontrado');
     const doc = this.documentoRepository.create({
@@ -55,7 +55,7 @@ export class DocumentosService {
       doc.proyecto = proyecto;
     }
     if (data.usuarioId) {
-      const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
+      const usuario = await this.usuarioRepository.findOneBy({ idsysuser: data.usuarioId });
       if (!usuario) throw new NotFoundException('Usuario no encontrado');
       doc.usuario = usuario;
     }

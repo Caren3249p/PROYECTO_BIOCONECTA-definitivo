@@ -6,7 +6,8 @@ import { Proyecto } from '../src/proyectos/proyectos.entity';
 import { Tarea } from '../src/tareas/tarea.entity';
 import { Hito } from '../src/Hitos/hitos.entity';
 import { Documento } from '../src/Documentos/documento.entity';
-import { Usuario } from '../src/usuarios/usuarios.entity';
+import { User } from '@sysuser/sysuser.entity';
+
 
 @Injectable()
 export class MetricasService {
@@ -21,8 +22,8 @@ export class MetricasService {
     private readonly hitoRepository: Repository<Hito>,
     @InjectRepository(Documento)
     private readonly documentoRepository: Repository<Documento>,
-    @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(User)
+    private readonly usuarioRepository: Repository<User>,
   ) {}
 
   async calcularMetricasProyecto(proyectoId: number): Promise<MetricaProyecto> {
@@ -66,7 +67,7 @@ export class MetricasService {
     metrica.hitosRetrasados = hitos.filter(h => h.estado === 'retrasado').length;
 
     // Calcular métricas de participación
-    const usuariosUnicos = [...new Set(tareas.map(t => t.usuario?.id).filter(id => id))];
+    const usuariosUnicos = [...new Set(tareas.map(t => t.usuario?.idsysuser).filter(id => id))];
     metrica.usuariosActivos = usuariosUnicos.length;
 
     const documentos = await this.documentoRepository.count({ where: { proyecto: { id: proyectoId } } });

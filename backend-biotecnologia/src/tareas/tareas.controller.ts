@@ -1,57 +1,62 @@
-import { Controller, Get, Post, Put, Body, Param, Delete, UsePipes, ValidationPipe, Req, UseGuards, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 import { LogsService } from '../logs/logs.service';
 import { TareasService } from './tareas.service';
 import { Tarea } from './tarea.entity';
-import { CreateTareaDto } from './dto/create-tarea.dto';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { CrearTareaDto } from './dto/crear-tarea.dto';
 
 @Controller('tareas')
 export class TareasController {
   constructor(
     private readonly tareasService: TareasService,
-    @Inject(LogsService) private readonly logsService: LogsService,
+    private readonly logsService: LogsService,
   ) {}
 
+  // 📋 Obtener todas las tareas
   @Get()
-  findAll(): Promise<Tarea[]> {
+  obtenerTodas(): Promise<Tarea[]> {
     return this.tareasService.findAll();
   }
 
+  // 🔍 Obtener una tarea por ID
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Tarea | null> {
+  obtenerPorId(@Param('id') id: string): Promise<Tarea | null> {
     return this.tareasService.findOne(Number(id));
   }
 
+  // ➕ Crear tarea
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Gestor', 'Administrador')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body() data: CreateTareaDto, @Req() req): Promise<Tarea> {
+  async crear(@Body() data: CrearTareaDto, @Req() req): Promise<Tarea> {
     const tarea = await this.tareasService.create(data);
-    const usuario = req.user?.email || 'anonimo';
+    const usuario = req.user?.email || 'anónimo';
     await this.logsService.registrar(usuario, 'Creó una tarea');
     return tarea;
   }
 
+  // ✏️ Actualizar tarea
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Gestor', 'Administrador')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async update(@Param('id') id: string, @Body() data: Partial<CreateTareaDto>, @Req() req): Promise<Tarea | null> {
+  async actualizar(@Param('id') id: string, @Body() data: Partial<CrearTareaDto>, @Req() req): Promise<Tarea | null> {
     const tarea = await this.tareasService.update(Number(id), data);
-    const usuario = req.user?.email || 'anonimo';
+    const usuario = req.user?.email || 'anónimo';
     await this.logsService.registrar(usuario, `Editó la tarea ${id}`);
     return tarea;
   }
 
+  // 🗑️ Eliminar tarea
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Gestor', 'Administrador')
-  async remove(@Param('id') id: string, @Req() req): Promise<void> {
+  async eliminar(@Param('id') id: string, @Req() req): Promise<void> {
     await this.tareasService.remove(Number(id));
-    const usuario = req.user?.email || 'anonimo';
+    const usuario = req.user?.email || 'anónimo';
     await this.logsService.registrar(usuario, `Eliminó la tarea ${id}`);
   }
 }
