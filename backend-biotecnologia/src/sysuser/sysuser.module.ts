@@ -6,8 +6,8 @@ import { SysUserController } from './sysuser.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
-  providers: [UserService],
   controllers: [SysUserController],
-  exports: [UserService],
+  providers: [UserService],
+  exports: [UserService, TypeOrmModule], // 👈 Muy importante
 })
 export class SysUserModule {}

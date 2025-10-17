@@ -43,7 +43,7 @@ export class ReportesHistorialService {
         usuario: registro.usuario?.userName || 'N/A',
         tipo: this.obtenerEtiquetaTipo(registro.tipoParticipacion),
         descripcion: registro.descripcion,
-        proyecto: registro.proyecto?.descripcion || 'N/A',
+       proyecto: registro.proyecto?.descripcion || 'N/A',
         fecha: registro.fechaEvento.toLocaleDateString('es-ES'),
         entidadTipo: registro.entidadTipo || 'N/A',
         entidadId: registro.entidadId || 'N/A'

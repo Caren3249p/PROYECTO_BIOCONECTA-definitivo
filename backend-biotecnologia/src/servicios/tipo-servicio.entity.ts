@@ -3,13 +3,12 @@ import { Servicio } from './servicio.entity';
 
 @Entity('serviceType')
 export class TipoServicio {
-  @PrimaryGeneratedColumn({ name: 'idserviceType' })
-  id: number;
+  @PrimaryGeneratedColumn()
+  idserviceType: number;
 
-  @Column({ name: 'description', type: 'varchar', length: 45 })
-  descripcion: string;
+  @Column({ type: 'varchar', length: 100 })
+  description: string;
 
-  // Relación inversa: un tipo de servicio tiene varios servicios
   @OneToMany(() => Servicio, (servicio) => servicio.tipoServicio)
   servicios: Servicio[];
 }

@@ -13,14 +13,14 @@ export class AuthService {
     const user = await this.users.validate(email, password);
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
 
-    const payload = { sub: user.idsysuser, email: user.email }; // ✅ campo correcto
+    const payload = { sub: user.id, email: user.email }; // ✅ campo correcto
     const access_token = await this.jwt.signAsync(payload);
 
     return {
       ok: true,
       access_token,
       user: {
-        idsysuser: user.idsysuser, // ✅ corregido
+        idsysuser: user.id, // ✅ corregido
         userName: user.userName,
         userLastname: user.userLastname,
         email: user.email,
@@ -35,6 +35,6 @@ export class AuthService {
     password: string;
   }) {
     const created = await this.users.create(dto);
-    return { ok: true, id: created.idsysuser }; // ✅ corregido
+    return { ok: true, id: created.id }; // ✅ corregido
   }
 }

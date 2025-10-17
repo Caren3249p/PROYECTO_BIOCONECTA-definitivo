@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tarea } from './tarea.entity';
+import { CrearTareaDto } from './dto/crear-tarea.dto';
 import { Proyecto } from '../proyectos/proyectos.entity';
 import { User } from '../sysuser/sysuser.entity';
-import { CrearTareaDto } from './dto/crear-tarea.dto';
 
 @Injectable()
 export class TareasService {
@@ -17,24 +17,18 @@ export class TareasService {
     private readonly usuarioRepositorio: Repository<User>,
   ) {}
 
-  // 📋 Mostrar todas las tareas
-  findAll(): Promise<Tarea[]> {
-    return this.tareaRepositorio.find({ relations: ['proyecto', 'usuario'] });
-  }
-
-  // 🔍 Buscar una tarea por ID
-  findOne(id: number): Promise<Tarea | null> {
-    return this.tareaRepositorio.findOne({ where: { id }, relations: ['proyecto', 'usuario'] });
-  }
-
-  // ➕ Crear una nueva tarea
+  // 🟢 Crear una nueva tarea
   async create(data: CrearTareaDto): Promise<Tarea> {
-    const proyecto = await this.proyectoRepositorio.findOne({ where: { id: data.proyectoId } });
+    const proyecto = await this.proyectoRepositorio.findOne({
+      where: { id: data.proyectoId },
+    });
 
-    const usuario = await this.usuarioRepositorio.findOne({ where: { idsysuser: data.usuarioId } });
+    const usuario = await this.usuarioRepositorio.findOne({
+      where: { id: data.usuarioId },
+    });
 
     if (!proyecto || !usuario) {
-      throw new Error('Proyecto o Usuario no encontrado');
+      throw new NotFoundException('Proyecto o usuario no encontrado');
     }
 
     const nuevaTarea = this.tareaRepositorio.create({
@@ -47,14 +41,32 @@ export class TareasService {
     return await this.tareaRepositorio.save(nuevaTarea);
   }
 
-  // ✏️ Actualizar una tarea
-  async update(id: number, data: Partial<Tarea>): Promise<Tarea | null> {
-    await this.tareaRepositorio.update(id, data);
-    return this.findOne(id);
+  // 🟡 Obtener todas las tareas
+  async findAll(): Promise<Tarea[]> {
+    return this.tareaRepositorio.find({ relations: ['proyecto', 'usuario'] });
   }
 
-  // 🗑️ Eliminar una tarea
+  // 🔵 Buscar tarea por ID
+  async findOne(id: number): Promise<Tarea> {
+    const tarea = await this.tareaRepositorio.findOne({
+      where: { idtask: id },
+      relations: ['proyecto', 'usuario'],
+    });
+
+    if (!tarea) throw new NotFoundException('Tarea no encontrada');
+    return tarea;
+  }
+
+  // 🟣 Actualizar tarea
+  async update(id: number, data: Partial<Tarea>): Promise<Tarea> {
+    const tarea = await this.findOne(id);
+    Object.assign(tarea, data);
+    return await this.tareaRepositorio.save(tarea);
+  }
+
+  // 🔴 Eliminar tarea
   async remove(id: number): Promise<void> {
-    await this.tareaRepositorio.delete(id);
+    const tarea = await this.findOne(id);
+    await this.tareaRepositorio.remove(tarea);
   }
 }

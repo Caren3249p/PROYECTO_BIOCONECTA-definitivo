@@ -1,221 +1,218 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import DashboardLayout from "../../components/DashboardLayout";
+import React, { useState, useEffect } from "react";
 
 export default function Proyectos() {
-  const navigate = useNavigate();
-
-  const [proyectos, setProyectos] = useState([]);
+  const [servicios, setServicios] = useState([]);
   const [form, setForm] = useState({
-    nombre: "",
     descripcion: "",
+    cost: "",
+    servicio: "",
     fechaInicio: "",
-    fechaFin: "",
+    fechaFinEsperada: "",
   });
-  const [mensaje, setMensaje] = useState("");
-  const [editId, setEditId] = useState(null);
 
-  // Cargar desde localStorage al inicio
+  const [mensaje, setMensaje] = useState(null);
+  const [tipoMensaje, setTipoMensaje] = useState(""); // success o error
+
   useEffect(() => {
-    const stored = localStorage.getItem("proyectos");
-    if (stored) setProyectos(JSON.parse(stored));
+    fetch("http://localhost:3000/servicios/nombres")
+      .then((res) => res.json())
+      .then((data) => setServicios(data))
+      .catch((err) => console.error("Error cargando servicios:", err));
   }, []);
 
-  // Guardar en localStorage cada vez que cambia
-  useEffect(() => {
-    localStorage.setItem("proyectos", JSON.stringify(proyectos));
-  }, [proyectos]);
-
   const onChange = (e) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nombre) {
-      setMensaje("⚠️ El nombre del proyecto es obligatorio");
-      return;
-    }
 
-    if (editId !== null) {
-      // Editar
-      setProyectos((prev) =>
-        prev.map((p) => (p.id === editId ? { ...p, ...form } : p))
-      );
-      setMensaje("✅ Proyecto actualizado");
-    } else {
-      // Crear nuevo
-      const nuevo = {
-        ...form,
-        id: Date.now(),
-        creadoEn: new Date().toLocaleString(),
-      };
-      setProyectos((prev) => [...prev, nuevo]);
-      setMensaje("✅ Proyecto creado exitosamente");
-    }
-
-    // Reset form
-    setForm({ nombre: "", descripcion: "", fechaInicio: "", fechaFin: "" });
-    setEditId(null);
-  };
-
-  const onEdit = (id) => {
-    const proyecto = proyectos.find((p) => p.id === id);
-    if (proyecto) {
-      setForm({
-        nombre: proyecto.nombre,
-        descripcion: proyecto.descripcion,
-        fechaInicio: proyecto.fechaInicio,
-        fechaFin: proyecto.fechaFin,
+    try {
+      const res = await fetch("http://localhost:3000/proyectos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
-      setEditId(id);
-      setMensaje("");
-    }
-  };
 
-  const onDelete = (id) => {
-    if (window.confirm("¿Eliminar este proyecto?")) {
-      setProyectos((prev) => prev.filter((p) => p.id !== id));
-      setMensaje("🗑️ Proyecto eliminado correctamente");
+      if (res.ok) {
+        setMensaje("Proyecto creado con éxito 🎉");
+        setTipoMensaje("success");
+        setForm({
+          descripcion: "",
+          cost: "",
+          servicio: "",
+          fechaInicio: "",
+          fechaFinEsperada: "",
+        });
+      } else {
+        setMensaje("Error al crear el proyecto ❌");
+        setTipoMensaje("error");
+      }
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      setMensaje("No se pudo conectar con el servidor ⚠️");
+      setTipoMensaje("error");
     }
+
+    // El mensaje desaparece en 4 segundos
+    setTimeout(() => setMensaje(null), 4000);
   };
 
   return (
-    <DashboardLayout
-      title="📁 Gestión de Proyectos"
-      subtitle="Crea, organiza y visualiza todos tus proyectos Bioconecta"
-    >
-      <section className="bg-slate-900/60 p-8 rounded-2xl shadow-lg border border-teal-500/20">
-        {/* FORMULARIO */}
-        <h2 className="text-2xl font-bold text-teal-300 mb-6 text-center">
-          {editId ? "Editar Proyecto" : "Crear Nuevo Proyecto"}
-        </h2>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-teal-900 to-slate-800 text-gray-100">
+      {/* 🔔 Notificación animada tipo “toast” */}
+      {mensaje && (
+        <div
+          className={`fixed top-6 right-6 z-50 transform transition-all duration-500 ease-in-out ${
+            tipoMensaje === "success"
+              ? "bg-teal-600 border border-teal-400 shadow-teal-500/40"
+              : "bg-red-600 border border-red-400 shadow-red-500/40"
+          } px-6 py-3 rounded-xl shadow-lg text-white font-semibold animate-fadeIn`}
+          style={{
+            animation:
+              "slideDown 0.4s ease-out, fadeOut 0.4s ease-in 3.6s forwards",
+          }}
+        >
+          {mensaje}
+        </div>
+      )}
 
+      {/* 🎨 Animaciones suaves para la notificación */}
+      <style>
+        {`
+          @keyframes slideDown {
+            from {
+              transform: translateY(-25px);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+          @keyframes fadeOut {
+            to {
+              opacity: 0;
+              transform: translateY(-15px);
+            }
+          }
+        `}
+      </style>
+
+      {/* Encabezado */}
+      <header className="py-10 text-center">
+        <h1 className="text-4xl font-extrabold text-teal-300 drop-shadow-md">
+          🧬 Crear Proyecto
+        </h1>
+        <p className="text-gray-400 mt-2">
+          Registra un nuevo proyecto con su información básica.
+        </p>
+      </header>
+
+      {/* Contenedor principal */}
+      <main className="flex-grow px-6 py-10 max-w-4xl mx-auto w-full">
         <form
           onSubmit={onSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10"
+          className="bg-slate-800/70 border border-teal-500/20 backdrop-blur-md rounded-2xl p-8 shadow-lg hover:shadow-teal-500/20 transition-all duration-300"
         >
-          <div>
-            <label className="block text-sm text-gray-300 mb-2" htmlFor="nombre">
-              Nombre del Proyecto
-            </label>
-            <input
-              id="nombre"
-              type="text"
-              placeholder="Ej. Sistema de energía renovable"
-              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={form.nombre}
-              onChange={onChange}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Descripción */}
+            <div className="md:col-span-2">
+              <label className="block mb-2 font-semibold text-teal-300">
+                Descripción:
+              </label>
+              <textarea
+                name="descripcion"
+                value={form.descripcion}
+                onChange={onChange}
+                className="w-full p-3 rounded-lg bg-slate-900/60 border border-teal-600/30 text-gray-100 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                rows="3"
+                placeholder="Describe el proyecto..."
+              />
+            </div>
 
-            <label
-              className="block text-sm text-gray-300 mt-4 mb-2"
-              htmlFor="descripcion"
-            >
-              Descripción
-            </label>
-            <textarea
-              id="descripcion"
-              placeholder="Describe brevemente el objetivo del proyecto..."
-              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              rows="3"
-              value={form.descripcion}
-              onChange={onChange}
-            ></textarea>
+            {/* Costo */}
+            <div>
+              <label className="block mb-2 font-semibold text-teal-300">
+                Costo:
+              </label>
+              <input
+                type="number"
+                name="cost"
+                value={form.cost}
+                onChange={onChange}
+                className="w-full p-3 rounded-lg bg-slate-900/60 border border-teal-600/30 text-gray-100 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                placeholder="Ejemplo: 1200000"
+              />
+            </div>
+
+            {/* Servicio */}
+            <div>
+              <label className="block mb-2 font-semibold text-teal-300">
+                Servicio:
+              </label>
+              <select
+                name="servicio"
+                value={form.servicio}
+                onChange={onChange}
+                className="w-full p-3 rounded-lg bg-slate-900/60 border border-teal-600/30 text-gray-100 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+                required
+              >
+                <option value="">Seleccione un servicio</option>
+                {servicios.map((nombre, index) => (
+                  <option key={index} value={nombre}>
+                    {nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Fechas */}
+            <div>
+              <label className="block mb-2 font-semibold text-teal-300">
+                Fecha de Inicio:
+              </label>
+              <input
+                type="date"
+                name="fechaInicio"
+                value={form.fechaInicio}
+                onChange={onChange}
+                className="w-full p-3 rounded-lg bg-slate-900/60 border border-teal-600/30 text-gray-100 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-teal-300">
+                Fecha Estimada de Fin:
+              </label>
+              <input
+                type="date"
+                name="fechaFinEsperada"
+                value={form.fechaFinEsperada}
+                onChange={onChange}
+                className="w-full p-3 rounded-lg bg-slate-900/60 border border-teal-600/30 text-gray-100 focus:ring-2 focus:ring-teal-400 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div>
-            <label
-              className="block text-sm text-gray-300 mb-2"
-              htmlFor="fechaInicio"
-            >
-              Fecha de Inicio
-            </label>
-            <input
-              id="fechaInicio"
-              type="date"
-              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={form.fechaInicio}
-              onChange={onChange}
-            />
-
-            <label
-              className="block text-sm text-gray-300 mt-4 mb-2"
-              htmlFor="fechaFin"
-            >
-              Fecha de Fin
-            </label>
-            <input
-              id="fechaFin"
-              type="date"
-              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              value={form.fechaFin}
-              onChange={onChange}
-            />
-
+          {/* Botón */}
+          <div className="mt-8 text-center">
             <button
               type="submit"
-              className="mt-6 w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-semibold py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-teal-500/30"
+              className="bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-teal-400/40 transition-all duration-300"
             >
-              {editId ? "Actualizar Proyecto" : "Crear Proyecto"}
+              Guardar Proyecto
             </button>
-
-            {mensaje && (
-              <p className="mt-4 text-center text-teal-400 font-medium">
-                {mensaje}
-              </p>
-            )}
           </div>
         </form>
+      </main>
 
-        {/* HISTORIAL DE PROYECTOS */}
-        <h3 className="text-xl font-bold text-teal-300 mb-4 border-b border-teal-500/30 pb-2">
-          🧾 Historial de Proyectos Creados
-        </h3>
-
-        {proyectos.length === 0 ? (
-          <p className="text-gray-400 text-center py-6">
-            📂 Aún no has creado ningún proyecto.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {proyectos.map((p) => (
-              <div
-                key={p.id}
-                className="bg-gray-800/50 border border-teal-500/20 rounded-xl p-5 shadow-md hover:shadow-teal-500/20 transition-all"
-              >
-                <h4 className="text-lg font-semibold text-teal-300">
-                  {p.nombre}
-                </h4>
-                <p className="text-gray-400 text-sm mt-1">{p.descripcion}</p>
-                <p className="text-xs text-gray-500 mt-2">
-                  📅 Inicio: {p.fechaInicio || "N/A"} | Fin:{" "}
-                  {p.fechaFin || "N/A"}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  ⏱️ Creado: {p.creadoEn}
-                </p>
-
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => onEdit(p.id)}
-                    className="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-lg text-sm hover:bg-yellow-500/30"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(p.id)}
-                    className="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-sm hover:bg-red-500/30"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </DashboardLayout>
+      {/* Footer */}
+      <footer className="py-8 bg-slate-950/70 border-t border-teal-600/20 text-center text-gray-400">
+        <p className="text-sm">
+          © {new Date().getFullYear()} Bioconecta — Innovación y Tecnología Verde 🌱
+        </p>
+      </footer>
+    </div>
   );
 }

@@ -1,20 +1,32 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Proyecto } from '../proyectos/proyectos.entity';
 
-@Entity('hitos')
+@Entity('hito') // ⚠️ o usa el nombre real de tu tabla (milestone, project_milestone, etc.)
 export class Hito {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'idhito' })
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   nombre: string;
 
-  @Column({ default: 'pendiente' })
-  estado: string; // 'pendiente', 'en progreso', 'completado', 'retrasado'
+  @Column({ type: 'text', nullable: true })
+  descripcion: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   fechaLimite: Date;
 
-  @ManyToOne(() => Proyecto, { nullable: false })
+  // Relación con proyecto
+  @ManyToOne(() => Proyecto, (proyecto) => proyecto.hitos)
+  @JoinColumn({ name: 'project_idproject' })
   proyecto: Proyecto;
+
+  @Column({ type: 'varchar', length: 50, default: 'pendiente' })
+  estado: string;
+
 }

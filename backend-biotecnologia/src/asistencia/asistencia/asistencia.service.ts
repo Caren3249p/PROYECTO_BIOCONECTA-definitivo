@@ -21,7 +21,7 @@ export class AsistenciaService {
   async registrar(data: { reservaId: number; usuarioId: number; presente: boolean }) {
     // 🔹 Buscar reserva y usuario
     const reserva = await this.reservaRepository.findOne({ where: { id: data.reservaId } });
-    const usuario = await this.usuarioRepository.findOne({ where: { idsysuser: data.usuarioId } });
+    const usuario = await this.usuarioRepository.findOne({ where: { id: data.usuarioId } });
 
     if (!reserva || !usuario) {
       throw new BadRequestException('Reserva o usuario no encontrados');

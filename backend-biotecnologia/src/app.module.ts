@@ -6,7 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { LogsModule } from './logs/logs.module';
 import { ProyectosModule } from './proyectos/proyectos.module';
-
+import { Hito } from './Hitos/hitos.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,6 +33,7 @@ import { ProyectosModule } from './proyectos/proyectos.module';
     SysUserModule,
     AuthModule,
     ServiciosModule,
+    Hito,
     LogsModule,
     ProyectosModule, // 👈 correcto (plural)
   ],

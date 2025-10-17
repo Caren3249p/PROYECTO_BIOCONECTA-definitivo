@@ -408,7 +408,7 @@ export class ReportesService {
       const eficiencia = 0; // Se calcularía basado en datos reales
 
       productividad.push({
-       usuario: usuario.userName || `Usuario ID: ${usuario.idsysuser}`,
+       usuario: usuario.userName || `Usuario ID: ${usuario.id}`,
         tareasCompletadas,
         horasTrabajo: horasTrabajo || 0,
         eficiencia

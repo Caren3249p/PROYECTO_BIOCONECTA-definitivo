@@ -77,4 +77,5 @@ export class MetricaProyecto {
 
   @Column({ type: 'date', nullable: true })
   fechaProximaRevision: Date;
+  tareasPausadas: number;
 }

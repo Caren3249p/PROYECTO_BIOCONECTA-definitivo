@@ -75,14 +75,14 @@ export class HistorialParticipacionService {
   }
 
   async crearRegistro(datos: CrearHistorialDto): Promise<HistorialParticipacion> {
-    const usuario = await this.usuarioRepository.findOne({ where: { idsysuser: datos.usuarioId } });
+    const usuario = await this.usuarioRepository.findOne({ where: { id: datos.usuarioId } });
     if (!usuario) {
       throw new Error('Usuario no encontrado');
     }
 
     let proyecto: Proyecto | null = null;
     if (datos.proyectoId) {
-      proyecto = await this.proyectoRepository.findOne({ where: { id: datos.proyectoId } });
+      proyecto = await this.proyectoRepository.findOne({ where: {id: datos.proyectoId } });
     }
 
     const registro = this.historialRepository.create({

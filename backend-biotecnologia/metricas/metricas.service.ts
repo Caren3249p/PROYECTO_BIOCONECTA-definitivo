@@ -55,8 +55,9 @@ export class MetricasService {
     metrica.totalTareas = tareas.length;
     metrica.tareasCompletadas = tareas.filter(t => t.estado === 'completada').length;
     metrica.tareasEnProgreso = tareas.filter(t => t.estado === 'en progreso').length;
+    metrica.tareasPausadas = tareas.filter(t => t.estado === 'pausada/bloqueda').length;
     metrica.tareasPendientes = tareas.filter(t => t.estado === 'pendiente').length;
-    metrica.tareasRetrasadas = tareas.filter(t => t.estado === 'retrasado').length;
+    metrica.tareasRetrasadas = tareas.filter(t => t.estado === 'Atrasada').length;
 
     metrica.porcentajeAvance = metrica.totalTareas > 0 ? (metrica.tareasCompletadas / metrica.totalTareas) * 100 : 0;
 
@@ -67,7 +68,7 @@ export class MetricasService {
     metrica.hitosRetrasados = hitos.filter(h => h.estado === 'retrasado').length;
 
     // Calcular métricas de participación
-    const usuariosUnicos = [...new Set(tareas.map(t => t.usuario?.idsysuser).filter(id => id))];
+    const usuariosUnicos = [...new Set(tareas.map(t => t.usuario?.id).filter(id => id))];
     metrica.usuariosActivos = usuariosUnicos.length;
 
     const documentos = await this.documentoRepository.count({ where: { proyecto: { id: proyectoId } } });

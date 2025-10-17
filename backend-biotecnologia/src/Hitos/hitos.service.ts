@@ -75,7 +75,7 @@ export class HitosService {
         hito.fechaLimite &&
         new Date(hito.fechaLimite) < hoy
       ) {
-        hito.estado = 'retrasado';
+        hito.estado = 'Atrasado';
       }
       return hito;
     });

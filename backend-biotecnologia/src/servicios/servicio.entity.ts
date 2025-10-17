@@ -1,22 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { TipoServicio } from './tipo-servicio.entity';
+import { Proyecto } from '../proyectos/proyectos.entity';
 
-@Entity('service') // nombre real de la tabla en MySQL
+@Entity('service')
 export class Servicio {
   @PrimaryGeneratedColumn({ name: 'idservice' })
   id: number;
 
-  @Column({ name: 'serviceName', type: 'varchar', length: 45 })
-  nombreServicio: string; // 👈 Este es el campo correcto (no 'nombre')
+  // 👇 Alias: en código se usa 'nombreServicio', pero la columna real es 'serviceName'
+  @Column({ name: 'serviceName', type: 'varchar', length: 100 })
+  nombreServicio: string;
 
-  @Column({ name: 'description', type: 'varchar', length: 45, nullable: true })
+  // 👇 Alias para descripción
+  @Column({ name: 'description', type: 'varchar', length: 300 })
   descripcion: string;
 
-  // Relación con tipo de servicio
   @ManyToOne(() => TipoServicio, (tipo) => tipo.servicios)
   @JoinColumn({ name: 'serviceType_idserviceType' })
   tipoServicio: TipoServicio;
 
-  @Column({ name: 'company_idcompany', type: 'int', nullable: true })
-  idEmpresa: number;
+  @OneToMany(() => Proyecto, (proyecto) => proyecto.servicio)
+  proyectos: Proyecto[];
 }

@@ -33,7 +33,7 @@ export class DocumentosService {
 
   async create(data: CreateDocumentoDto): Promise<Documento> {
     const proyecto = await this.proyectoRepository.findOneBy({ id: data.proyectoId });
-    const usuario = await this.usuarioRepository.findOneBy({ idsysuser: data.usuarioId });
+    const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
     if (!proyecto) throw new NotFoundException('Proyecto no encontrado');
     if (!usuario) throw new NotFoundException('Usuario no encontrado');
     const doc = this.documentoRepository.create({
@@ -55,7 +55,7 @@ export class DocumentosService {
       doc.proyecto = proyecto;
     }
     if (data.usuarioId) {
-      const usuario = await this.usuarioRepository.findOneBy({ idsysuser: data.usuarioId });
+      const usuario = await this.usuarioRepository.findOneBy({ id: data.usuarioId });
       if (!usuario) throw new NotFoundException('Usuario no encontrado');
       doc.usuario = usuario;
     }

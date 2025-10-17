@@ -7,31 +7,18 @@ import { Servicio } from './servicio.entity';
 export class ServiciosService {
   constructor(
     @InjectRepository(Servicio)
-    private readonly servicioRepositorio: Repository<Servicio>,
+    private readonly servicioRepo: Repository<Servicio>,
   ) {}
 
-  listarTodos() {
-    return this.servicioRepositorio.find({ relations: ['tipoServicio'] });
-  }
+  // ✅ Devuelve solo los nombres de los servicios
+  async findAllNames(): Promise<string[]> {
+    const resultados = await this.servicioRepo
+      .createQueryBuilder('servicio')
+      .select('servicio.serviceName', 'nombreServicio')
+      .getRawMany();
 
-  buscarPorId(id: number) {
-    return this.servicioRepositorio.findOne({
-      where: { id },
-      relations: ['tipoServicio'],
-    });
-  }
-
-  crear(datos: Partial<Servicio>) {
-    const nuevo = this.servicioRepositorio.create(datos);
-    return this.servicioRepositorio.save(nuevo);
-  }
-
-  async actualizar(id: number, datos: Partial<Servicio>) {
-    await this.servicioRepositorio.update(id, datos);
-    return this.buscarPorId(id);
-  }
-
-  eliminar(id: number) {
-    return this.servicioRepositorio.delete(id);
+    // Solo retornamos la lista de nombres
+    return resultados.map((r) => r.nombreServicio);
   }
 }
+

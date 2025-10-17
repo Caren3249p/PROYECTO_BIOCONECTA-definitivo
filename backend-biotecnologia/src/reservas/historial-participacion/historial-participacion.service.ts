@@ -82,7 +82,7 @@ export class HistorialParticipacionService {
   async crearRegistro(datos: CrearHistorialDto): Promise<HistorialParticipacion> {
     // ❌ Antes: id → ✅ Ahora: idsysuser
     const usuario = await this.usuarioRepository.findOne({
-      where: { idsysuser: datos.usuarioId },
+      where: { id: datos.usuarioId },
     });
 
     if (!usuario) {

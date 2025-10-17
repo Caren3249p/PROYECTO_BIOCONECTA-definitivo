@@ -1,87 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import DashboardLayout from "../../components/DashboardLayout";
+import React, { useState, useEffect } from "react";
 
 export default function Tareas() {
-  const navigate = useNavigate();
-
   const [tareas, setTareas] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
   const [form, setForm] = useState({
     descripcion: "",
+    estado: "",
     proyectoId: "",
-    usuarioId: "",
-    estado: "pendiente",
+    usuarioId: 1, // puedes cambiarlo por el usuario logueado
   });
   const [mensaje, setMensaje] = useState("");
-  const [editId, setEditId] = useState(null);
 
-  // Cargar tareas desde localStorage
+  // ✅ Cargar proyectos para el select
   useEffect(() => {
-    const stored = localStorage.getItem("tareas");
-    if (stored) setTareas(JSON.parse(stored));
+    fetch("http://localhost:3000/proyectos")
+      .then((res) => res.json())
+      .then((data) => setProyectos(data))
+      .catch((err) => console.error("Error cargando proyectos:", err));
   }, []);
 
-  // Guardar tareas cada vez que cambian
+  // ✅ Cargar tareas existentes
   useEffect(() => {
-    localStorage.setItem("tareas", JSON.stringify(tareas));
-  }, [tareas]);
+    fetch("http://localhost:3000/tareas")
+      .then((res) => res.json())
+      .then((data) => setTareas(data))
+      .catch((err) => console.error("Error cargando tareas:", err));
+  }, []);
 
   const onChange = (e) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = (e) => {
+  // ✅ Crear tarea
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.descripcion) {
-      setMensaje("⚠️ La descripción es obligatoria");
-      return;
-    }
+    setMensaje("");
 
-    if (editId !== null) {
-      // Editar tarea
-      setTareas((prev) =>
-        prev.map((t) => (t.id === editId ? { ...t, ...form } : t))
-      );
-      setMensaje("✅ Tarea actualizada");
-    } else {
-      // Crear nueva tarea
-      const nueva = {
-        ...form,
-        id: Date.now(),
-        creadaEn: new Date().toLocaleString(),
-      };
-      setTareas((prev) => [...prev, nueva]);
-      setMensaje("✅ Tarea creada exitosamente");
-    }
-
-    // Reset form
-    setForm({
-      descripcion: "",
-      proyectoId: "",
-      usuarioId: "",
-      estado: "pendiente",
-    });
-    setEditId(null);
-  };
-
-  const onEdit = (id) => {
-    const tarea = tareas.find((t) => t.id === id);
-    if (tarea) {
-      setForm({
-        descripcion: tarea.descripcion,
-        proyectoId: tarea.proyectoId,
-        usuarioId: tarea.usuarioId,
-        estado: tarea.estado,
+    try {
+      const res = await fetch("http://localhost:3000/tareas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
-      setEditId(id);
-      setMensaje("");
-    }
-  };
 
-  const onDelete = (id) => {
-    if (window.confirm("¿Eliminar esta tarea?")) {
-      setTareas((prev) => prev.filter((t) => t.id !== id));
-      setMensaje("🗑️ Tarea eliminada correctamente");
+      if (!res.ok) throw new Error("Error al crear la tarea");
+
+      setMensaje("✅ Tarea creada correctamente");
+
+      const updated = await fetch("http://localhost:3000/tareas").then((r) =>
+        r.json()
+      );
+      setTareas(updated);
+      setForm({ descripcion: "", estado: "", proyectoId: "", usuarioId: 1 });
+    } catch (err) {
+      console.error(err);
+      setMensaje("❌ Error al guardar la tarea");
     }
   };
 

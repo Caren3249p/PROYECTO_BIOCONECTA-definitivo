@@ -1,33 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
-import { ProyectoService } from './proyectos.service';
-import { Proyecto } from './proyectos.entity';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { ProyectosService } from './proyectos.service';
+import { CrearProyectoDto } from './create-proyecto.dto';
 
 @Controller('proyectos')
-export class ProyectoController {
-  constructor(private readonly proyectoService: ProyectoService) {}
+export class ProyectosController {
+  constructor(private readonly proyectosService: ProyectosService) {}
 
   @Get()
   findAll() {
-    return this.proyectoService.findAll();
+    return this.proyectosService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.proyectoService.findOne(id);
+    return this.proyectosService.findOne(id);
   }
 
   @Post()
-  create(@Body() data: Partial<Proyecto>) {
-    return this.proyectoService.create(data);
-  }
-
-  @Put(':id')
-  update(@Param('id') id: number, @Body() data: Partial<Proyecto>) {
-    return this.proyectoService.update(id, data);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.proyectoService.remove(id);
+  create(@Body() data: CrearProyectoDto) {
+    return this.proyectosService.create(data);
   }
 }

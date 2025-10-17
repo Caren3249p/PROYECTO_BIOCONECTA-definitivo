@@ -1,27 +1,58 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Tarea } from '../tareas/tarea.entity'; // 👈 importante importar Tarea
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { Servicio } from '../servicios/servicio.entity';
+import { Hito } from '../Hitos/hitos.entity';
+import { Tarea } from '../tareas/tarea.entity';
+import { User } from '../sysuser/sysuser.entity';
 
-@Entity('proyectos')
+@Entity('project')
 export class Proyecto {
-  @PrimaryGeneratedColumn({ name: 'idproyecto' })
+  @PrimaryGeneratedColumn({ name: 'idproject' })
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  nombre: string;
-
-  @Column({ type: 'text', nullable: true })
+  // ⚙️ Mapeamos 'description' de la base como 'descripcion' y damos alias 'nombre'
+  @Column({ name: 'description', type: 'varchar', length: 45 })
   descripcion: string;
 
-  @Column({ type: 'float', nullable: true })
-  costo: number;
+  // ⚙️ Alias virtual para compatibilidad con reportes y métricas
+  get nombre(): string {
+    return this.descripcion;
+  }
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ name: 'cost', type: 'float' })
+  cost: number;
+
+  @Column({ name: 'startDate', type: 'datetime' })
   fechaInicio: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ name: 'endDateExpectation', type: 'datetime' })
+  fechaFinEsperada: Date;
+
+  @Column({ name: 'endDate', type: 'datetime' })
   fechaFin: Date;
 
-  // ✅ Relación inversa que soluciona el error
+  // Relación con servicio
+  @ManyToOne(() => Servicio, (servicio) => servicio.proyectos)
+  @JoinColumn({ name: 'service_idservice' })
+  servicio: Servicio;
+
+  // Relación con estado del proyecto
+  @Column({ name: 'projectStatus_idprojectStatus', type: 'int' })
+  estadoProyecto: number;
+
+  // ⚙️ Relaciones lógicas
+  @OneToMany(() => Hito, (hito) => hito.proyecto)
+  hitos: Hito[];
+
   @OneToMany(() => Tarea, (tarea) => tarea.proyecto)
   tareas: Tarea[];
+
+  // ⚙️ Relación con usuario (aunque tu DB no lo tiene, dejamos el campo virtual)
+  usuario?:   User;
 }
