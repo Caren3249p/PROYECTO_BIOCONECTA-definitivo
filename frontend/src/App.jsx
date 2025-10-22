@@ -12,6 +12,7 @@ import Proyectos from "./pages/dashboard/Proyectos";
 import Tareas from "./pages/dashboard/Tareas";
 import Historial from "./pages/dashboard/Historial";
 import Reportes from "./pages/dashboard/Reportes";
+import Documentos from "./pages/dashboard/Documentos";
 import PrivateRoute from "./components/PrivateRoute"; // protege rutas internas
 
 export default function App() {
@@ -69,6 +70,15 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/documentos"
+          element={
+            <PrivateRoute>
+              <Documentos />
+            </PrivateRoute>
+          }
+        />
+        
       </Routes>
     </Router>
   );
