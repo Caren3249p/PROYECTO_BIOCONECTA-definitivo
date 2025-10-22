@@ -7,7 +7,7 @@ import { ServiciosModule } from './servicios/servicios.module';
 import { LogsModule } from './logs/logs.module';
 import { ProyectosModule } from './proyectos/proyectos.module';
 import { Hito } from './Hitos/hitos.entity';
-import { RecursosModule } from '../recursos/recursos.module';
+import { RecursosModule } from './recursos/recursos.module';
 
 @Module({
   imports: [
