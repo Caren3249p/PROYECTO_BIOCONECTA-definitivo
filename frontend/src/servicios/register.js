@@ -1,22 +1,12 @@
 const API_URL = "http://localhost:3000/auth/register";
 
+// Modo demo: registro simulado sin backend
 export async function register(data) {
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    console.log("📩 Respuesta del backend:", result);
-
-    if (!response.ok) throw new Error(result.message || "Error al registrar");
-
-    return result;
-  } catch (error) {
-    console.error("❌ Error al conectar con el backend:", error);
-    throw error;
+  const users = JSON.parse(localStorage.getItem("demo_users") || "[]");
+  if (users.find(u => u.email === data.email)) {
+    return { ok: false, message: "El correo ya está registrado (demo)" };
   }
+  users.push({ ...data });
+  localStorage.setItem("demo_users", JSON.stringify(users));
+  return { ok: true };
 }

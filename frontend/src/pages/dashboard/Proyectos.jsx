@@ -13,11 +13,17 @@ export default function Proyectos() {
   const [mensaje, setMensaje] = useState(null);
   const [tipoMensaje, setTipoMensaje] = useState(""); // success o error
 
+  // Modo demo: simular lista de servicios
   useEffect(() => {
-    fetch("http://localhost:3000/servicios/nombres")
-      .then((res) => res.json())
-      .then((data) => setServicios(data))
-      .catch((err) => console.error("Error cargando servicios:", err));
+    // Simula servicios de ejemplo
+    setServicios([
+      "Consultoría Biotecnológica",
+      "Análisis de Laboratorio",
+      "Capacitación Técnica",
+      "Desarrollo de Prototipos",
+      "Asesoría en Regulación",
+      "Transferencia de Tecnología"
+    ]);
   }, []);
 
   const onChange = (e) => {
