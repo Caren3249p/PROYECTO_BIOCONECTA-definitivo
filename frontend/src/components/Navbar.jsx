@@ -49,8 +49,7 @@ export default function Navbar() {
   // Si es admin, agrega enlaces exclusivos
   if (rol === "Administrador") {
     privateLinks.push({ href: "/usuarios-demo", label: "Usuarios" });
-    privateLinks.push({ href: "/logs-demo", label: "Logs" });
-    privateLinks.push({ href: "/estadisticas-admin", label: "Estadísticas" });
+    // Logs y Estadísticas removidos del menú admin
   }
 
   return (

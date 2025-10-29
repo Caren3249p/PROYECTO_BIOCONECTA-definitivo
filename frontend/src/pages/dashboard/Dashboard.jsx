@@ -49,6 +49,12 @@ export default function Dashboard() {
               link: "/reportes",
               icon: "📊",
             },
+            {
+              titulo: "Servicios",
+              desc: "Consulta y solicita servicios biotecnológicos.",
+              link: "/servicios",
+              icon: "📝",
+            },
           ].map((card) => (
             <Link
               key={card.titulo}

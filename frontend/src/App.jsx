@@ -74,6 +74,14 @@ export default function App() {
           }
         />
         <Route
+          path="/servicios"
+          element={
+            <PrivateRoute>
+              <Servicios />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/usuarios-demo"
           element={
             <PrivateRoute>
