@@ -45,6 +45,7 @@ export default function Navbar() {
     { href: "/tareas", label: "Tareas" },
     { href: "/historial", label: "Historial" },
     { href: "/reportes", label: "Reportes" },
+    { href: "/servicios", label: "Servicios" },
   ];
   // Si es admin, agrega enlaces exclusivos
   if (rol === "Administrador") {
