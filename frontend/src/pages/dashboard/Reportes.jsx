@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent } from "../../components/ui/card.jsx";
 
 const Reportes = () => {
   const [reportes, setReportes] = useState([]);
+  const [reportesFiltrados, setReportesFiltrados] = useState([]);
   const [filtros, setFiltros] = useState({
     fechaInicio: "",
     fechaFin: "",
@@ -16,10 +17,46 @@ const Reportes = () => {
   useEffect(() => {
     const guardados = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
     setProyectos(guardados);
-    // Cargar reportes guardados
+    // Cargar reportes guardados pero NO mostrarlos automáticamente
     const reportesGuardados = JSON.parse(localStorage.getItem("demo_reportes") || "[]");
     setReportes(reportesGuardados);
+    // Inicializar reportesFiltrados como array vacío para que no se muestren reportes al cargar
+    setReportesFiltrados([]);
   }, []);
+
+  // Función para filtrar reportes
+  const filtrarReportes = () => {
+    let reportesFiltrados = [...reportes];
+
+    // Filtrar por tipo de reporte
+    reportesFiltrados = reportesFiltrados.filter(reporte => reporte.tipo === filtros.tipoReporte);
+
+    // Filtrar por proyecto si está seleccionado
+    if (filtros.proyectoId) {
+      reportesFiltrados = reportesFiltrados.filter(reporte => 
+        String(reporte.proyecto?.id) === String(filtros.proyectoId)
+      );
+    }
+
+    // Filtrar por fechas si están establecidas
+    if (filtros.fechaInicio) {
+      reportesFiltrados = reportesFiltrados.filter(reporte => {
+        const fechaReporte = new Date(reporte.fecha.split('/').reverse().join('-'));
+        const fechaInicio = new Date(filtros.fechaInicio);
+        return fechaReporte >= fechaInicio;
+      });
+    }
+
+    if (filtros.fechaFin) {
+      reportesFiltrados = reportesFiltrados.filter(reporte => {
+        const fechaReporte = new Date(reporte.fecha.split('/').reverse().join('-'));
+        const fechaFin = new Date(filtros.fechaFin);
+        return fechaReporte <= fechaFin;
+      });
+    }
+
+    setReportesFiltrados(reportesFiltrados);
+  };
 
   const generarReporte = () => {
     if (!filtros.proyectoId && filtros.tipoReporte === "proyecto") {
@@ -77,6 +114,8 @@ const Reportes = () => {
       const nuevosReportes = [nuevo, ...reportes];
       setReportes(nuevosReportes);
       localStorage.setItem("demo_reportes", JSON.stringify(nuevosReportes));
+      // Mostrar automáticamente el reporte recién generado
+      setReportesFiltrados([nuevo]);
       setLoading(false);
     }, 900);
   };
@@ -185,31 +224,37 @@ const Reportes = () => {
               >
                 {loading ? "Generando..." : "Generar Reporte"}
               </button>
+              <button
+                onClick={filtrarReportes}
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium shadow-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+              >
+                Filtrar Reportes
+              </button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Resultados */}
-        {reportes.length === 0 ? (
+        /* Resultados */
+        {reportesFiltrados.length === 0 ? (
           <Card className="bg-slate-900/50 border border-teal-500/20 backdrop-blur-md text-center py-12">
             <CardContent>
               <p className="text-gray-400 text-lg">
-                No se han generado reportes aún.
+                No hay reportes para mostrar.
               </p>
               <p className="text-gray-500 mt-2">
-                Configura los filtros y genera tu primer reporte.
+                Genera un nuevo reporte o usa 'Filtrar Reportes' para ver reportes existentes.
               </p>
             </CardContent>
           </Card>
         ) : (
-          reportes.map((reporte, index) => (
+          reportesFiltrados.map((reporte, index) => (
             <Card
               key={index}
               className="mb-8 bg-slate-900/60 border border-teal-500/20 rounded-2xl shadow-lg hover:border-teal-400/40 transition-all"
             >
               <CardHeader>
                 <h3 className="text-2xl font-semibold text-teal-300">
-                  📁 {reporte.tipo.toUpperCase()}
+                  📁 {reporte.proyecto?.nombre || reporte.proyecto?.descripcion || `Reporte ${reporte.tipo.toUpperCase()}`}
                 </h3>
                 <p className="text-gray-400 text-sm">📅 {reporte.fecha}</p>
               </CardHeader>

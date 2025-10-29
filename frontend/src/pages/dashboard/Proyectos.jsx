@@ -37,22 +37,40 @@ export default function Proyectos() {
     let nuevosProyectos = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
     let nuevoProyecto = null;
     if (editId) {
-      nuevosProyectos = nuevosProyectos.map(p => p.id === editId ? { ...form, id: editId } : p);
+      nuevosProyectos = nuevosProyectos.map(p => p.id === editId ? { ...form, id: editId, fechaCreacion: p.fechaCreacion } : p);
       setMensaje("Proyecto actualizado con éxito 🎉");
       setTipoMensaje("success");
       setEditId(null);
     } else {
-      nuevoProyecto = { ...form, id: Date.now() };
+      const ahora = new Date();
+      const fechaCreacion = ahora.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      nuevoProyecto = { 
+        ...form, 
+        id: Date.now() + Math.random(), // Hacer ID más único
+        fechaCreacion: fechaCreacion
+      };
       nuevosProyectos.push(nuevoProyecto);
       setMensaje("Proyecto creado con éxito 🎉");
       setTipoMensaje("success");
-      // Agregar al historial demo
+      // Agregar al historial demo usando la fecha de inicio del proyecto
       let historial = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+      const fechaEventoHistorial = form.fechaInicio 
+        ? new Date(form.fechaInicio + 'T00:00:00').toISOString()
+        : new Date().toISOString();
       historial.unshift({
-        id: Date.now(),
+        id: Date.now() + Math.random(),
         tipoParticipacion: "proyecto_asignado",
         descripcion: `Proyecto creado: ${form.descripcion}`,
-        fechaEvento: new Date().toISOString().slice(0,10),
+        fechaEvento: fechaEventoHistorial,
+        proyectoId: nuevoProyecto.id,
+        fechaInicio: form.fechaInicio,
+        fechaFinEsperada: form.fechaFinEsperada,
       });
       localStorage.setItem("demo_historial", JSON.stringify(historial));
     }
@@ -267,6 +285,9 @@ export default function Proyectos() {
                   <p className="text-gray-400 text-sm mt-1">Servicio: <span className="text-teal-400">{p.servicio}</span></p>
                   <p className="text-gray-400 text-sm">Costo: <span className="text-teal-300">${p.cost}</span></p>
                   <p className="text-xs text-gray-500 mt-2">Inicio: {p.fechaInicio || "-"} | Fin estimada: {p.fechaFinEsperada || "-"}</p>
+                  {p.fechaCreacion && (
+                    <p className="text-xs text-gray-600 mt-1">📅 Creado: {p.fechaCreacion}</p>
+                  )}
                   {rol === "Administrador" && (
                     <div className="flex justify-end gap-2 mt-4">
                       <button

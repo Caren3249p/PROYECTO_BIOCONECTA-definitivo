@@ -29,6 +29,7 @@ const tipoColors = {
 export default function Historial() {
   const navigate = useNavigate();
   const [historial, setHistorial] = useState([]);
+  const [historialFiltrado, setHistorialFiltrado] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState({
     tipoParticipacion: "",
@@ -45,24 +46,64 @@ export default function Historial() {
     cargarHistorialDemo();
     cargarEstadisticasDemo();
     // eslint-disable-next-line
-  }, [filtros]);
+  }, []);
 
-  // Simular historial demo en localStorage
+  // Cargar historial demo en localStorage pero NO mostrar automáticamente
   const cargarHistorialDemo = () => {
     setLoading(true);
-    let demo = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+    const demo = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+    setHistorial(demo);
+    // Inicializar historialFiltrado como array vacío para que no se muestren actividades al cargar
+    setHistorialFiltrado([]);
+    setLoading(false);
+  };
+
+  // Función para filtrar historial
+  const filtrarHistorial = () => {
+    let historialFiltrado = [...historial];
+
     // Filtros locales
     if (filtros.tipoParticipacion) {
-      demo = demo.filter(h => h.tipoParticipacion === filtros.tipoParticipacion);
+      historialFiltrado = historialFiltrado.filter(h => h.tipoParticipacion === filtros.tipoParticipacion);
     }
-    if (filtros.fechaInicio) {
-      demo = demo.filter(h => h.fechaEvento >= filtros.fechaInicio);
+
+    // Filtro por fechas del proyecto (fechaInicio/fechaFinEsperada)
+    if (filtros.fechaInicio && !filtros.fechaFin) {
+      // Solo fecha inicio: mostrar proyectos que inician de esa fecha en adelante
+      historialFiltrado = historialFiltrado.filter(h => {
+        if (h.fechaInicio) {
+          return h.fechaInicio >= filtros.fechaInicio;
+        }
+        // Para actividades sin fecha de proyecto, usar fechaEvento como fallback
+        const fechaEvento = new Date(h.fechaEvento).toISOString().split('T')[0];
+        return fechaEvento >= filtros.fechaInicio;
+      });
+    } else if (!filtros.fechaInicio && filtros.fechaFin) {
+      // Solo fecha fin: mostrar proyectos que terminan antes de esa fecha
+      historialFiltrado = historialFiltrado.filter(h => {
+        if (h.fechaFinEsperada) {
+          return h.fechaFinEsperada <= filtros.fechaFin;
+        }
+        // Para actividades sin fecha de proyecto, usar fechaEvento como fallback
+        const fechaEvento = new Date(h.fechaEvento).toISOString().split('T')[0];
+        return fechaEvento <= filtros.fechaFin;
+      });
+    } else if (filtros.fechaInicio && filtros.fechaFin) {
+      // Ambas fechas: proyectos dentro del rango
+      historialFiltrado = historialFiltrado.filter(h => {
+        if (h.fechaInicio && h.fechaFinEsperada) {
+          // Proyecto debe empezar después del inicio del filtro y terminar antes del fin del filtro
+          return h.fechaInicio >= filtros.fechaInicio && h.fechaFinEsperada <= filtros.fechaFin;
+        }
+        // Para actividades sin fechas de proyecto, usar fechaEvento como fallback
+        const fechaEvento = new Date(h.fechaEvento).toISOString().split('T')[0];
+        return fechaEvento >= filtros.fechaInicio && fechaEvento <= filtros.fechaFin;
+      });
     }
-    if (filtros.fechaFin) {
-      demo = demo.filter(h => h.fechaEvento <= filtros.fechaFin);
-    }
-    setHistorial(demo.slice(0, filtros.limite));
-    setLoading(false);
+
+    // Aplicar límite
+    const resultado = historialFiltrado.slice(0, filtros.limite);
+    setHistorialFiltrado(resultado);
   };
 
   // Estadísticas demo
@@ -185,7 +226,9 @@ export default function Historial() {
                   handleFiltroChange("fechaInicio", e.target.value)
                 }
                 className="w-full px-3 py-2 bg-slate-800/50 border border-teal-500/30 rounded-lg text-gray-100 focus:ring-2 focus:ring-teal-400"
+                placeholder="Desde esta fecha..."
               />
+              <p className="text-xs text-gray-500 mt-1">Proyectos que inician desde esta fecha</p>
             </div>
 
             <div>
@@ -197,7 +240,9 @@ export default function Historial() {
                 value={filtros.fechaFin}
                 onChange={(e) => handleFiltroChange("fechaFin", e.target.value)}
                 className="w-full px-3 py-2 bg-slate-800/50 border border-teal-500/30 rounded-lg text-gray-100 focus:ring-2 focus:ring-teal-400"
+                placeholder="Hasta esta fecha..."
               />
+              <p className="text-xs text-gray-500 mt-1">Proyectos que terminan hasta esta fecha</p>
             </div>
 
             <div>
@@ -214,9 +259,15 @@ export default function Historial() {
               </select>
             </div>
 
-            <div className="flex items-end">
+            <div className="flex items-end gap-2">
               <button
-                onClick={() =>
+                onClick={filtrarHistorial}
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Filtrar Historial
+              </button>
+              <button
+                onClick={() => {
                   setFiltros({
                     tipoParticipacion: "",
                     proyectoId: "",
@@ -224,11 +275,12 @@ export default function Historial() {
                     fechaFin: "",
                     limite: 20,
                     pagina: 1,
-                  })
-                }
+                  });
+                  setHistorialFiltrado([]);
+                }}
                 className="w-full px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
               >
-                Limpiar Filtros
+                Limpiar
               </button>
             </div>
           </div>
@@ -249,12 +301,18 @@ export default function Historial() {
           </div>
 
           <div className="divide-y divide-slate-800">
-            {historial.length === 0 ? (
+            {historialFiltrado.length === 0 ? (
               <div className="p-12 text-center text-gray-400">
-                📝 No hay actividades registradas
+                <p className="text-lg mb-2">📝 No hay actividades para mostrar</p>
+                <p className="text-sm">
+                  {historial.length === 0 
+                    ? "No hay actividades registradas aún." 
+                    : "Usa 'Filtrar Historial' para ver las actividades disponibles."
+                  }
+                </p>
               </div>
             ) : (
-              historial.map((item, index) => (
+              historialFiltrado.map((item, index) => (
                 <div
                   key={item.id || index}
                   className="p-6 hover:bg-slate-800/50 transition-all"

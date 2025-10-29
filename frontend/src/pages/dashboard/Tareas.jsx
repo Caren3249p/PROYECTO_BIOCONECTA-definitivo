@@ -21,6 +21,7 @@ export default function Tareas() {
   }, []);
   // --- FIN: Crear usuario admin demo ---
   const [tareas, setTareas] = useState([]);
+  const [tareasFiltradas, setTareasFiltradas] = useState([]);
   const [proyectos, setProyectos] = useState([]);
   const [form, setForm] = useState({
     descripcion: "",
@@ -31,13 +32,25 @@ export default function Tareas() {
   const [mensaje, setMensaje] = useState("");
   const [editId, setEditId] = useState(null);
 
-  // Cargar proyectos y tareas desde localStorage
+  // Cargar proyectos y tareas desde localStorage pero NO mostrar tareas automáticamente
   useEffect(() => {
     const proys = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
     setProyectos(proys);
     const ts = JSON.parse(localStorage.getItem("demo_tareas") || "[]");
     setTareas(ts);
+    // Inicializar tareasFiltradas como array vacío para que no se muestren tareas al cargar
+    setTareasFiltradas([]);
   }, []);
+
+  // Función para filtrar tareas por proyecto
+  const filtrarTareasPorProyecto = (proyectoId) => {
+    if (!proyectoId) {
+      setTareasFiltradas([]);
+      return;
+    }
+    const tareasDelProyecto = tareas.filter(t => String(t.proyectoId) === String(proyectoId));
+    setTareasFiltradas(tareasDelProyecto);
+  };
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -62,6 +75,10 @@ export default function Tareas() {
     }
     localStorage.setItem("demo_tareas", JSON.stringify(nuevasTareas));
     setTareas(nuevasTareas);
+    // Mostrar automáticamente las tareas del proyecto al crear/editar
+    if (form.proyectoId) {
+      filtrarTareasPorProyecto(form.proyectoId);
+    }
     setForm({ descripcion: "", estado: "pendiente", proyectoId: "", usuarioId: 1 });
     setTimeout(() => setMensaje(""), 3000);
   };
@@ -80,9 +97,14 @@ export default function Tareas() {
   };
 
   const onDelete = (id) => {
+    const tareaAEliminar = tareas.find(t => t.id === id);
     const nuevasTareas = tareas.filter(t => t.id !== id);
     localStorage.setItem("demo_tareas", JSON.stringify(nuevasTareas));
     setTareas(nuevasTareas);
+    // Actualizar tareas filtradas también
+    if (tareaAEliminar) {
+      filtrarTareasPorProyecto(tareaAEliminar.proyectoId);
+    }
     setMensaje("Tarea eliminada");
     setTimeout(() => setMensaje(""), 2000);
   };
@@ -179,18 +201,50 @@ export default function Tareas() {
           </div>
         </form>
 
+        {/* FILTRO POR PROYECTO */}
+        <div className="mb-6 p-4 bg-slate-800/50 border border-teal-500/30 rounded-xl">
+          <h4 className="text-lg font-semibold text-teal-300 mb-3">🔍 Filtrar Tareas por Proyecto</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <select
+              onChange={(e) => filtrarTareasPorProyecto(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg bg-gray-800/60 border border-teal-600/30 text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            >
+              <option value="">Selecciona un proyecto para ver sus tareas</option>
+              {proyectos.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.descripcion || p.nombre || `Proyecto #${p.id}`}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => {
+                setTareasFiltradas([]);
+                // Resetear el select
+                const select = document.querySelector('select');
+                if (select) select.value = '';
+              }}
+              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+            >
+              Limpiar Filtro
+            </button>
+          </div>
+        </div>
+
         {/* HISTORIAL DE TAREAS */}
         <h3 className="text-xl font-bold text-teal-300 mb-4 border-b border-teal-500/30 pb-2">
-          📋 Historial de Tareas Creadas
+          📋 Tareas del Proyecto Seleccionado
         </h3>
 
-        {tareas.length === 0 ? (
+        {tareasFiltradas.length === 0 ? (
           <p className="text-gray-400 text-center py-6">
-            💤 No hay tareas registradas aún.
+            {tareas.length === 0 
+              ? "💤 No hay tareas registradas aún." 
+              : "🔍 Selecciona un proyecto al crear una tarea para ver las tareas de ese proyecto."
+            }
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {tareas.map((t) => (
+            {tareasFiltradas.map((t) => (
               <div
                 key={t.id}
                 className="bg-gray-800/50 border border-teal-500/20 rounded-xl p-5 shadow-md hover:shadow-teal-500/20 transition-all"
