@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/public/Home";              // ✅ tu landing principal
@@ -14,8 +14,35 @@ import Historial from "./pages/dashboard/Historial";
 import Reportes from "./pages/dashboard/Reportes";
 import Documentos from "./pages/dashboard/Documentos";
 import PrivateRoute from "./components/PrivateRoute"; // protege rutas internas
+import UsuariosDemo from "./pages/dashboard/UsuariosDemo";
+import LogsDemo from "./pages/dashboard/LogsDemo";
+import EstadisticasAdmin from "./pages/dashboard/EstadisticasAdmin";
+        <Route
+          path="/estadisticas-admin"
+          element={
+            <PrivateRoute>
+              <EstadisticasAdmin />
+            </PrivateRoute>
+          }
+        />
 
 export default function App() {
+  // --- INICIO: Crear usuario admin demo en localStorage si no existe ---
+  useEffect(() => {
+    const demoAdmin = {
+      userName: "sebastian",
+      apellido: "hernandez",
+      email: "juansehr1122@gmail.com",
+      password: "123456789",
+      rol: "Administrador"
+    };
+    let users = JSON.parse(localStorage.getItem("demo_users") || "[]");
+    if (!users.some(u => u.email === demoAdmin.email)) {
+      users.push(demoAdmin);
+      localStorage.setItem("demo_users", JSON.stringify(users));
+    }
+  }, []);
+  // --- FIN: Crear usuario admin demo ---
   return (
     <Router>
       <Navbar />
@@ -43,6 +70,22 @@ export default function App() {
           element={
             <PrivateRoute>
               <Proyectos />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/usuarios-demo"
+          element={
+            <PrivateRoute>
+              <UsuariosDemo />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/logs-demo"
+          element={
+            <PrivateRoute>
+              <LogsDemo />
             </PrivateRoute>
           }
         />

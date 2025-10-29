@@ -12,62 +12,73 @@ const Reportes = () => {
   const [loading, setLoading] = useState(false);
   const [proyectos, setProyectos] = useState([]);
 
+  // Cargar proyectos desde localStorage
   useEffect(() => {
-    cargarProyectos();
+    const guardados = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
+    setProyectos(guardados);
+    // Cargar reportes guardados
+    const reportesGuardados = JSON.parse(localStorage.getItem("demo_reportes") || "[]");
+    setReportes(reportesGuardados);
   }, []);
 
-  const cargarProyectos = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/proyectos", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setProyectos(data);
-      }
-    } catch (error) {
-      console.error("Error al cargar proyectos:", error);
-    }
-  };
-
-  const generarReporte = async () => {
+  const generarReporte = () => {
     if (!filtros.proyectoId && filtros.tipoReporte === "proyecto") {
       alert("Selecciona un proyecto para generar el reporte");
       return;
     }
     setLoading(true);
     setTimeout(() => {
+      const proyectoSel = proyectos.find((p) => String(p.id) === String(filtros.proyectoId));
+      // Obtener tareas reales del proyecto seleccionado
+      const todasTareas = JSON.parse(localStorage.getItem("demo_tareas") || "[]");
+      const tareasProyecto = todasTareas.filter(t => String(t.proyectoId) === String(proyectoSel?.id));
+      const completadas = tareasProyecto.filter(t => t.estado === "completada").length;
+      const enProgreso = tareasProyecto.filter(t => t.estado === "en progreso").length;
+      const pendientes = tareasProyecto.filter(t => t.estado === "pendiente").length;
+      // Progreso: % de tareas completadas
+      const totalTareas = tareasProyecto.length;
+      const progresoGeneral = totalTareas > 0 ? Math.round((completadas / totalTareas) * 100) : 0;
+      // Eficiencia: % de tareas no retrasadas (simulado)
+      const eficienciaTemporal = totalTareas > 0 ? Math.round(((completadas + enProgreso) / totalTareas) * 100) : 0;
+      // Calidad: simulado como % de tareas completadas sin errores (aquí igual a completadas)
+      const calidadEntregables = progresoGeneral;
+      // Riesgo: bajo si hay menos de 2 tareas pendientes, medio si 2-4, alto si más
+      let nivelRiesgo = "Bajo";
+      if (pendientes >= 4) nivelRiesgo = "Alto";
+      else if (pendientes >= 2) nivelRiesgo = "Medio";
+      // Alertas
+      const alertas = [];
+      if (pendientes > 0) {
+        alertas.push({
+          tipo: "warning",
+          titulo: "Tareas próximas al vencimiento",
+          mensaje: `${pendientes} tarea${pendientes > 1 ? 's' : ''} pendiente${pendientes > 1 ? 's' : ''} en este proyecto.`
+        });
+      }
       const nuevo = {
+        id: Date.now(),
         tipo: filtros.tipoReporte,
         fecha: new Date().toLocaleDateString(),
-        proyecto: proyectos.find((p) => p.id === parseInt(filtros.proyectoId)),
+        proyecto: proyectoSel,
         metricas: {
-          progresoGeneral: 85,
-          eficienciaTemporal: 92,
-          calidadEntregables: 88,
-          nivelRiesgo: "Medio",
+          progresoGeneral,
+          eficienciaTemporal,
+          calidadEntregables,
+          nivelRiesgo,
         },
         tareas: {
-          completadas: 12,
-          enProgreso: 3,
-          pendientes: 1,
-          retrasadas: 0,
+          completadas,
+          enProgreso,
+          pendientes,
+          retrasadas: 0, // No se calcula en demo
         },
-        alertas: [
-          {
-            tipo: "warning",
-            titulo: "Tareas próximas al vencimiento",
-            mensaje: "2 tareas están a punto de superar su fecha límite.",
-          },
-        ],
+        alertas,
       };
-      setReportes([nuevo, ...reportes]);
+      const nuevosReportes = [nuevo, ...reportes];
+      setReportes(nuevosReportes);
+      localStorage.setItem("demo_reportes", JSON.stringify(nuevosReportes));
       setLoading(false);
-    }, 1200);
+    }, 900);
   };
 
   return (
@@ -114,20 +125,26 @@ const Reportes = () => {
                   <label className="block text-sm text-teal-300 mb-1">
                     Proyecto
                   </label>
-                  <select
-                    value={filtros.proyectoId}
-                    onChange={(e) =>
-                      setFiltros({ ...filtros, proyectoId: e.target.value })
-                    }
-                    className="w-full px-3 py-2 bg-slate-800/70 border border-teal-500/20 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                  >
-                    <option value="">Seleccionar proyecto...</option>
-                    {proyectos.map((proyecto) => (
-                      <option key={proyecto.id} value={proyecto.id}>
-                        {proyecto.nombre}
-                      </option>
-                    ))}
-                  </select>
+                  {proyectos.length === 0 ? (
+                    <div className="text-gray-400 italic py-2 px-3 bg-slate-800/70 rounded-lg border border-teal-500/20">
+                      No hay proyectos disponibles. Crea uno primero.
+                    </div>
+                  ) : (
+                    <select
+                      value={filtros.proyectoId}
+                      onChange={(e) =>
+                        setFiltros({ ...filtros, proyectoId: e.target.value })
+                      }
+                      className="w-full px-3 py-2 bg-slate-800/70 border border-teal-500/20 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    >
+                      <option value="">Seleccionar proyecto...</option>
+                      {proyectos.map((proyecto) => (
+                        <option key={proyecto.id} value={proyecto.id}>
+                          {proyecto.nombre || proyecto.descripcion || `Proyecto #${proyecto.id}`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               )}
 

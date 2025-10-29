@@ -23,7 +23,10 @@ export default function Navbar() {
   }, [pathname]);
 
   const handleLogout = () => {
-    localStorage.clear();
+    // Solo borra datos de sesión, no los datos demo
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("nombre");
     setIsLogged(false);
     setRol(null);
     navigate("/"); // regresa a la página de inicio
@@ -36,13 +39,19 @@ export default function Navbar() {
     { href: "/servicios", label: "Servicios" },
   ];
 
-  const privateLinks = [
+  let privateLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/proyectos", label: "Proyectos" },
     { href: "/tareas", label: "Tareas" },
     { href: "/historial", label: "Historial" },
     { href: "/reportes", label: "Reportes" },
   ];
+  // Si es admin, agrega enlaces exclusivos
+  if (rol === "Administrador") {
+    privateLinks.push({ href: "/usuarios-demo", label: "Usuarios" });
+    privateLinks.push({ href: "/logs-demo", label: "Logs" });
+    privateLinks.push({ href: "/estadisticas-admin", label: "Estadísticas" });
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-teal-500/20 shadow-lg">

@@ -42,54 +42,43 @@ export default function Historial() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    cargarHistorial();
-    cargarEstadisticas();
-  }, [navigate, filtros]);
+    cargarHistorialDemo();
+    cargarEstadisticasDemo();
+    // eslint-disable-next-line
+  }, [filtros]);
 
-  const cargarHistorial = async () => {
-    const token = localStorage.getItem("token");
+  // Simular historial demo en localStorage
+  const cargarHistorialDemo = () => {
     setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      Object.entries(filtros).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
-      const res = await fetch(
-        `http://localhost:3000/historial-participacion?${params}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setHistorial(data.data.registros || []);
-      } else {
-        setError("Error al cargar el historial");
-      }
-    } catch (error) {
-      setError("Error de conexión");
-    } finally {
-      setLoading(false);
+    let demo = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+    // Filtros locales
+    if (filtros.tipoParticipacion) {
+      demo = demo.filter(h => h.tipoParticipacion === filtros.tipoParticipacion);
     }
+    if (filtros.fechaInicio) {
+      demo = demo.filter(h => h.fechaEvento >= filtros.fechaInicio);
+    }
+    if (filtros.fechaFin) {
+      demo = demo.filter(h => h.fechaEvento <= filtros.fechaFin);
+    }
+    setHistorial(demo.slice(0, filtros.limite));
+    setLoading(false);
   };
 
-  const cargarEstadisticas = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(
-        "http://localhost:3000/historial-participacion/estadisticas",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setEstadisticas(data.data);
-      }
-    } catch (error) {
-      console.error("Error al cargar estadísticas:", error);
-    }
+  // Estadísticas demo
+  const cargarEstadisticasDemo = () => {
+    const demo = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+    setEstadisticas({
+      totalActividades: demo.length,
+      tareasCompletadas: demo.filter(h => h.tipoParticipacion === "tarea_completada").length,
+      proyectosActivos: 1,
+      actividadesSemana: demo.filter(h => {
+        const fecha = new Date(h.fechaEvento);
+        const ahora = new Date();
+        const unaSemana = 7 * 24 * 60 * 60 * 1000;
+        return ahora - fecha <= unaSemana;
+      }).length,
+    });
   };
 
   const formatearFecha = (fecha) =>

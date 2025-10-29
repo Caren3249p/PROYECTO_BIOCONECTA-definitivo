@@ -1,69 +1,95 @@
+
+
 import React, { useState, useEffect } from "react";
 
 export default function Tareas() {
+  const rol = localStorage.getItem("rol");
+  // --- INICIO: Crear usuario admin demo en localStorage si no existe ---
+  useEffect(() => {
+    const demoAdmin = {
+      userName: "sebastian",
+      apellido: "hernandez",
+      email: "juansehr1122@gmail.com",
+      password: "123456789",
+      rol: "Administrador"
+    };
+    let users = JSON.parse(localStorage.getItem("demo_users") || "[]");
+    if (!users.some(u => u.email === demoAdmin.email)) {
+      users.push(demoAdmin);
+      localStorage.setItem("demo_users", JSON.stringify(users));
+    }
+  }, []);
+  // --- FIN: Crear usuario admin demo ---
   const [tareas, setTareas] = useState([]);
   const [proyectos, setProyectos] = useState([]);
   const [form, setForm] = useState({
     descripcion: "",
-    estado: "",
+    estado: "pendiente",
     proyectoId: "",
-    usuarioId: 1, // puedes cambiarlo por el usuario logueado
+    usuarioId: 1,
   });
   const [mensaje, setMensaje] = useState("");
+  const [editId, setEditId] = useState(null);
 
-  // ✅ Cargar proyectos para el select
+  // Cargar proyectos y tareas desde localStorage
   useEffect(() => {
-    fetch("http://localhost:3000/proyectos")
-      .then((res) => res.json())
-      .then((data) => setProyectos(data))
-      .catch((err) => console.error("Error cargando proyectos:", err));
-  }, []);
-
-  // ✅ Cargar tareas existentes
-  useEffect(() => {
-    fetch("http://localhost:3000/tareas")
-      .then((res) => res.json())
-      .then((data) => setTareas(data))
-      .catch((err) => console.error("Error cargando tareas:", err));
+    const proys = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
+    setProyectos(proys);
+    const ts = JSON.parse(localStorage.getItem("demo_tareas") || "[]");
+    setTareas(ts);
   }, []);
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Crear tarea
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
     setMensaje("");
-
-    try {
-      const res = await fetch("http://localhost:3000/tareas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error("Error al crear la tarea");
-
+    let nuevasTareas = JSON.parse(localStorage.getItem("demo_tareas") || "[]");
+    if (editId) {
+      nuevasTareas = nuevasTareas.map(t => t.id === editId ? { ...form, id: editId, creadaEn: t.creadaEn } : t);
+      setMensaje("✅ Tarea actualizada correctamente");
+      setEditId(null);
+    } else {
+      const nueva = {
+        ...form,
+        id: Date.now(),
+        creadaEn: new Date().toLocaleString(),
+      };
+      nuevasTareas.push(nueva);
       setMensaje("✅ Tarea creada correctamente");
+    }
+    localStorage.setItem("demo_tareas", JSON.stringify(nuevasTareas));
+    setTareas(nuevasTareas);
+    setForm({ descripcion: "", estado: "pendiente", proyectoId: "", usuarioId: 1 });
+    setTimeout(() => setMensaje(""), 3000);
+  };
 
-      const updated = await fetch("http://localhost:3000/tareas").then((r) =>
-        r.json()
-      );
-      setTareas(updated);
-      setForm({ descripcion: "", estado: "", proyectoId: "", usuarioId: 1 });
-    } catch (err) {
-      console.error(err);
-      setMensaje("❌ Error al guardar la tarea");
+  const onEdit = (id) => {
+    const tarea = tareas.find(t => t.id === id);
+    if (tarea) {
+      setForm({
+        descripcion: tarea.descripcion,
+        estado: tarea.estado,
+        proyectoId: tarea.proyectoId,
+        usuarioId: tarea.usuarioId,
+      });
+      setEditId(id);
     }
   };
 
+  const onDelete = (id) => {
+    const nuevasTareas = tareas.filter(t => t.id !== id);
+    localStorage.setItem("demo_tareas", JSON.stringify(nuevasTareas));
+    setTareas(nuevasTareas);
+    setMensaje("Tarea eliminada");
+    setTimeout(() => setMensaje(""), 2000);
+  };
+
   return (
-    <DashboardLayout
-      title="🧩 Gestión de Tareas"
-      subtitle="Crea, organiza y visualiza todas tus tareas Bioconecta"
-    >
-      <section className="bg-slate-900/60 p-8 rounded-2xl shadow-lg border border-teal-500/20">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-teal-900 to-slate-800 text-gray-100">
+      <section className="bg-slate-900/60 p-8 rounded-2xl shadow-lg border border-teal-500/20 max-w-4xl mx-auto mt-10">
         {/* FORMULARIO */}
         <h2 className="text-2xl font-bold text-teal-300 mb-6 text-center">
           {editId ? "Editar Tarea" : "Crear Nueva Tarea"}
@@ -84,6 +110,7 @@ export default function Tareas() {
               className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={form.descripcion}
               onChange={onChange}
+              name="descripcion"
               required
             />
 
@@ -91,16 +118,21 @@ export default function Tareas() {
               className="block text-sm text-gray-300 mt-4 mb-2"
               htmlFor="proyectoId"
             >
-              ID del Proyecto
+              Proyecto
             </label>
-            <input
+            <select
               id="proyectoId"
-              type="number"
-              placeholder="Ej. 101"
-              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              name="proyectoId"
+              className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={form.proyectoId}
               onChange={onChange}
-            />
+              required
+            >
+              <option value="">Seleccione un proyecto</option>
+              {proyectos.map((p) => (
+                <option key={p.id} value={p.id}>{p.descripcion}</option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -109,6 +141,7 @@ export default function Tareas() {
             </label>
             <input
               id="usuarioId"
+              name="usuarioId"
               type="number"
               placeholder="Ej. 12"
               className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -121,6 +154,7 @@ export default function Tareas() {
             </label>
             <select
               id="estado"
+              name="estado"
               className="w-full px-4 py-2 rounded-lg bg-gray-800/60 border border-teal-500/30 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={form.estado}
               onChange={onChange}
@@ -165,7 +199,7 @@ export default function Tareas() {
                   {t.descripcion}
                 </h4>
                 <p className="text-gray-400 text-sm mt-1">
-                  Estado:{" "}
+                  Estado: {" "}
                   <span
                     className={`${
                       t.estado === "completada"
@@ -179,32 +213,33 @@ export default function Tareas() {
                   </span>
                 </p>
                 <p className="text-xs text-gray-500 mt-2">
-                  🧩 Proyecto ID: {t.proyectoId || "N/A"} | 👤 Usuario ID:{" "}
-                  {t.usuarioId || "N/A"}
+                  🧩 Proyecto: {proyectos.find(p => p.id == t.proyectoId)?.descripcion || t.proyectoId || "N/A"} | 👤 Usuario ID: {t.usuarioId || "N/A"}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   ⏱️ Creada: {t.creadaEn}
                 </p>
 
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => onEdit(t.id)}
-                    className="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-lg text-sm hover:bg-yellow-500/30"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(t.id)}
-                    className="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-sm hover:bg-red-500/30"
-                  >
-                    Eliminar
-                  </button>
-                </div>
+                {rol === "Administrador" && (
+                  <div className="flex justify-end gap-2 mt-4">
+                    <button
+                      onClick={() => onEdit(t.id)}
+                      className="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-lg text-sm hover:bg-yellow-500/30"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDelete(t.id)}
+                      className="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-sm hover:bg-red-500/30"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </section>
-    </DashboardLayout>
+    </div>
   );
 }

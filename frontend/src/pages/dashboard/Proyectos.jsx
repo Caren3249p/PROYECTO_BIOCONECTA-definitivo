@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 
 export default function Proyectos() {
+  const rol = localStorage.getItem("rol");
   const [servicios, setServicios] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
   const [form, setForm] = useState({
     descripcion: "",
     cost: "",
@@ -9,59 +12,83 @@ export default function Proyectos() {
     fechaInicio: "",
     fechaFinEsperada: "",
   });
-
   const [mensaje, setMensaje] = useState(null);
-  const [tipoMensaje, setTipoMensaje] = useState(""); // success o error
+  const [tipoMensaje, setTipoMensaje] = useState("");
+  const [editId, setEditId] = useState(null);
 
-  // Modo demo: simular lista de servicios
+  // Cargar servicios demo y proyectos guardados
   useEffect(() => {
-    // Simula servicios de ejemplo
     setServicios([
       "Consultoría Biotecnológica",
-      "Análisis de Laboratorio",
-      "Capacitación Técnica",
-      "Desarrollo de Prototipos",
-      "Asesoría en Regulación",
-      "Transferencia de Tecnología"
+      "Investigación y Desarrollo",
+      "Capacitación",
+      "Sostenibilidad"
     ]);
+    const guardados = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
+    setProyectos(guardados);
   }, []);
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      const res = await fetch("http://localhost:3000/proyectos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+    let nuevosProyectos = JSON.parse(localStorage.getItem("demo_proyectos") || "[]");
+    let nuevoProyecto = null;
+    if (editId) {
+      nuevosProyectos = nuevosProyectos.map(p => p.id === editId ? { ...form, id: editId } : p);
+      setMensaje("Proyecto actualizado con éxito 🎉");
+      setTipoMensaje("success");
+      setEditId(null);
+    } else {
+      nuevoProyecto = { ...form, id: Date.now() };
+      nuevosProyectos.push(nuevoProyecto);
+      setMensaje("Proyecto creado con éxito 🎉");
+      setTipoMensaje("success");
+      // Agregar al historial demo
+      let historial = JSON.parse(localStorage.getItem("demo_historial") || "[]");
+      historial.unshift({
+        id: Date.now(),
+        tipoParticipacion: "proyecto_asignado",
+        descripcion: `Proyecto creado: ${form.descripcion}`,
+        fechaEvento: new Date().toISOString().slice(0,10),
       });
-
-      if (res.ok) {
-        setMensaje("Proyecto creado con éxito 🎉");
-        setTipoMensaje("success");
-        setForm({
-          descripcion: "",
-          cost: "",
-          servicio: "",
-          fechaInicio: "",
-          fechaFinEsperada: "",
-        });
-      } else {
-        setMensaje("Error al crear el proyecto ❌");
-        setTipoMensaje("error");
-      }
-    } catch (error) {
-      console.error("Error al enviar:", error);
-      setMensaje("No se pudo conectar con el servidor ⚠️");
-      setTipoMensaje("error");
+      localStorage.setItem("demo_historial", JSON.stringify(historial));
     }
-
-    // El mensaje desaparece en 4 segundos
+    localStorage.setItem("demo_proyectos", JSON.stringify(nuevosProyectos));
+    setProyectos(nuevosProyectos);
+    setForm({
+      descripcion: "",
+      cost: "",
+      servicio: "",
+      fechaInicio: "",
+      fechaFinEsperada: "",
+    });
     setTimeout(() => setMensaje(null), 4000);
+  };
+
+  const onEdit = (id) => {
+    const proyecto = proyectos.find(p => p.id === id);
+    if (proyecto) {
+      setForm({
+        descripcion: proyecto.descripcion,
+        cost: proyecto.cost,
+        servicio: proyecto.servicio,
+        fechaInicio: proyecto.fechaInicio,
+        fechaFinEsperada: proyecto.fechaFinEsperada,
+      });
+      setEditId(id);
+    }
+  };
+
+  const onDelete = (id) => {
+    const nuevosProyectos = proyectos.filter(p => p.id !== id);
+    localStorage.setItem("demo_proyectos", JSON.stringify(nuevosProyectos));
+    setProyectos(nuevosProyectos);
+    setMensaje("Proyecto eliminado");
+    setTipoMensaje("success");
+    setTimeout(() => setMensaje(null), 2000);
   };
 
   return (
@@ -207,10 +234,60 @@ export default function Proyectos() {
               type="submit"
               className="bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-teal-400/40 transition-all duration-300"
             >
-              Guardar Proyecto
+              {editId ? "Actualizar Proyecto" : "Guardar Proyecto"}
             </button>
+            {editId && (
+              <button
+                type="button"
+                className="ml-4 bg-gray-600 hover:bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300"
+                onClick={() => {
+                  setEditId(null);
+                  setForm({ descripcion: "", cost: "", servicio: "", fechaInicio: "", fechaFinEsperada: "" });
+                }}
+              >
+                Cancelar
+              </button>
+            )}
           </div>
         </form>
+
+        {/* Listado de proyectos */}
+        <section className="mt-12">
+          <h2 className="text-2xl font-bold text-teal-300 mb-6 text-center">📋 Proyectos Registrados</h2>
+          {proyectos.length === 0 ? (
+            <p className="text-gray-400 text-center py-6">No hay proyectos registrados aún.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {proyectos.map((p) => (
+                <div
+                  key={p.id}
+                  className="bg-gray-800/50 border border-teal-500/20 rounded-xl p-5 shadow-md hover:shadow-teal-500/20 transition-all"
+                >
+                  <h4 className="text-lg font-semibold text-teal-300">{p.descripcion}</h4>
+                  <p className="text-gray-400 text-sm mt-1">Servicio: <span className="text-teal-400">{p.servicio}</span></p>
+                  <p className="text-gray-400 text-sm">Costo: <span className="text-teal-300">${p.cost}</span></p>
+                  <p className="text-xs text-gray-500 mt-2">Inicio: {p.fechaInicio || "-"} | Fin estimada: {p.fechaFinEsperada || "-"}</p>
+                  {rol === "Administrador" && (
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        onClick={() => onEdit(p.id)}
+                        className="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-lg text-sm hover:bg-yellow-500/30"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => onDelete(p.id)}
+                        className="bg-red-500/20 text-red-400 px-3 py-1 rounded-lg text-sm hover:bg-red-500/30"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
 
       {/* Footer */}

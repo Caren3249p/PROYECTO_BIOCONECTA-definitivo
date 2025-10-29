@@ -44,12 +44,6 @@ export default function Dashboard() {
               icon: "🧩",
             },
             {
-              titulo: "Historial",
-              desc: "Observa tus registros de participación.",
-              link: "/historial",
-              icon: "📜",
-            },
-            {
               titulo: "Reportes",
               desc: "Genera y descarga informes personalizados.",
               link: "/reportes",
